@@ -796,39 +796,336 @@ function openRecipeDetails(recipe) {
   openDrawer();
 }
 
+// --- Global Cuisine Database ---
+const cuisineDatabase = {
+  tunisian: [
+    {
+      id: 'tun1',
+      title: 'Tunisian Royal Couscous',
+      calories: '520 kcal',
+      prepTime: '45 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Heritage',
+      ingredients: ['Couscous Semolina', 'Chickpeas', 'Zucchini', 'Carrots', 'Ras el Hanout Harissa', 'Olive Oil']
+    },
+    {
+      id: 'tun2',
+      title: 'Ojja Shakshuka with Harissa',
+      calories: '320 kcal',
+      prepTime: '20 mins',
+      image: 'assets/salmon.jpg',
+      culture: 'Tunisian Traditional',
+      ingredients: ['Organic Eggs', 'Red Bell Peppers', 'Fresh Tomatoes', 'Harissa Paste', 'Olive Oil', 'Garlic']
+    },
+    {
+      id: 'tun3',
+      title: 'Crispy Tuna & Parsley Brik',
+      calories: '290 kcal',
+      prepTime: '15 mins',
+      image: 'assets/pastry.jpg',
+      culture: 'Tunisian Coastline',
+      ingredients: ['Malsouka pastry sheets', 'Canned Tuna', 'Egg', 'Fresh Parsley', 'Capers', 'Lemon juice']
+    }
+  ],
+  italian: [
+    {
+      id: 'it1',
+      title: 'Porcini Mushroom Risotto',
+      calories: '410 kcal',
+      prepTime: '30 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Northern Italian',
+      ingredients: ['Arborio Rice', 'Porcini Mushrooms', 'Truffle Oil', 'Parmigiano Reggiano', 'White Wine']
+    },
+    {
+      id: 'it2',
+      title: 'Classic Tomato Basil Bruschetta',
+      calories: '180 kcal',
+      prepTime: '12 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tuscan Countryside',
+      ingredients: ['Rustic Bread', 'Ripe Tomatoes', 'Fresh Garlic', 'Extra Virgin Olive Oil', 'Fresh Basil']
+    }
+  ],
+  japanese: [
+    {
+      id: 'jp1',
+      title: 'Artisanal Veggie Sushi Platter',
+      calories: '350 kcal',
+      prepTime: '25 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Traditional Tokyo',
+      ingredients: ['Sushi Rice', 'Nori Sheets', 'Avocado', 'Cucumber', 'Pickled Ginger', 'Wasabi']
+    },
+    {
+      id: 'jp2',
+      title: 'Matcha Cold Soba Noodles',
+      calories: '280 kcal',
+      prepTime: '15 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Kyoto Green Hills',
+      ingredients: ['Matcha Buckwheat Noodles', 'Tsuyu Dipping Sauce', 'Scallions', 'Sesame Seeds', 'Wasabi']
+    }
+  ],
+  mexican: [
+    {
+      id: 'mx1',
+      title: 'Smashed Avocado & Black Bean Tacos',
+      calories: '370 kcal',
+      prepTime: '18 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Oaxacan Street Food',
+      ingredients: ['Corn Tortillas', 'Black Beans', 'Smashed Avocado', 'Fresh Cilantro', 'Lime juice', 'Cotija Cheese']
+    }
+  ],
+  french: [
+    {
+      id: 'fr1',
+      title: 'Provencal Vegetable Ratatouille',
+      calories: '240 kcal',
+      prepTime: '45 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'French Riviera',
+      ingredients: ['Eggplant', 'Zucchini', 'Yellow Squash', 'Bell Peppers', 'Herbes de Provence', 'Olive Oil']
+    }
+  ],
+  moroccan: [
+    {
+      id: 'mor1',
+      title: 'Apricot & Chickpea Tagine',
+      calories: '380 kcal',
+      prepTime: '35 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Moroccan Medina',
+      ingredients: ['Chickpeas', 'Dried Apricots', 'Butternut Squash', 'Moroccan Cumin & Cinnamon', 'Toasted Almonds']
+    }
+  ]
+};
+
 // --- AI Concierge Drawer Trigger ---
 function triggerAIConcierge() {
-  const salmonTitle = state.recipes[0].title[state.region];
+  const queryInput = document.getElementById('search-input');
+  const query = queryInput ? queryInput.value.trim().toLowerCase() : '';
   
+  // Clear search input for next time
+  if (queryInput) queryInput.value = '';
+
+  let initialCuisine = '';
+  if (query.includes('tunis') || query.includes('shakshuka') || query.includes('couscous') || query.includes('brik') || query.includes('ojja')) {
+    initialCuisine = 'tunisian';
+  } else if (query.includes('ital')) {
+    initialCuisine = 'italian';
+  } else if (query.includes('japan') || query.includes('sushi')) {
+    initialCuisine = 'japanese';
+  } else if (query.includes('mexic') || query.includes('taco')) {
+    initialCuisine = 'mexican';
+  } else if (query.includes('french') || query.includes('rata')) {
+    initialCuisine = 'french';
+  } else if (query.includes('moroc') || query.includes('tagine')) {
+    initialCuisine = 'moroccan';
+  }
+
+  renderAIDrawerLayout(initialCuisine);
+  openDrawer();
+}
+
+function renderAIDrawerLayout(activeCuisineKey = '') {
   dom.drawerContent.innerHTML = `
-    <div class="drawer-header">
+    <div class="drawer-header" style="margin-bottom: 12px;">
       <div class="drawer-title-col">
-        <span class="drawer-origin" data-localize="ai_concierge_title">ACH AI Concierge</span>
-        <h2 class="drawer-title" style="font-family: var(--font-serif); font-size: 24px; color: var(--color-dusty-rose);">
-          Your Personal Menu Concept
-        </h2>
+        <span class="drawer-origin" style="color: var(--color-dusty-rose); font-weight: 600;">ACH AI Concierge</span>
+        <h2 class="drawer-title" style="font-family: var(--font-serif); font-size: 22px;">Global Culinary Assistant</h2>
       </div>
     </div>
     
-    <div style="background-color: var(--color-champagne-bg); border-radius: 16px; padding: 16px; margin-bottom: 20px; font-size: 13px; line-height: 1.5; color: var(--color-text-charcoal); border: 1px solid var(--color-border);">
-      <p data-localize="ai_concierge_intro">${locales[state.lang].ai_concierge_intro}</p>
-      <div style="margin-top: 12px; display: flex; align-items: center; gap: 8px;">
-        <span style="font-size: 24px;">🐟</span>
-        <strong>${salmonTitle}</strong>
+    <div style="margin-bottom: 16px;">
+      <p style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 8px;">
+        Type any country or select a quick shortcut to explore national foods and ingredients:
+      </p>
+      
+      <!-- Interactive AI Drawer Search -->
+      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <input type="text" id="ai-drawer-search" placeholder="Type country (e.g. Tunisia, Italy, Japan)..." 
+               style="flex: 1; padding: 10px; border-radius: 12px; border: 1px solid var(--color-border); font-size: 13px; outline: none; background: var(--color-champagne-bg);"
+               value="${activeCuisineKey ? activeCuisineKey.charAt(0).toUpperCase() + activeCuisineKey.slice(1) : ''}">
+        <button id="ai-drawer-search-btn" style="background: var(--color-dusty-rose); color: white; border: none; padding: 8px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer;">
+          Ask
+        </button>
+      </div>
+
+      <!-- Quick Country Toggles -->
+      <div class="quick-countries-row" style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;">
+        <button class="country-chip" data-cuisine="tunisian" style="padding: 6px 12px; border-radius: 100px; border: 1px solid var(--color-border); background: white; font-size: 12px; cursor: pointer; white-space: nowrap;">🇹🇳 Tunisia</button>
+        <button class="country-chip" data-cuisine="italian" style="padding: 6px 12px; border-radius: 100px; border: 1px solid var(--color-border); background: white; font-size: 12px; cursor: pointer; white-space: nowrap;">🇮🇹 Italy</button>
+        <button class="country-chip" data-cuisine="japanese" style="padding: 6px 12px; border-radius: 100px; border: 1px solid var(--color-border); background: white; font-size: 12px; cursor: pointer; white-space: nowrap;">🇯🇵 Japan</button>
+        <button class="country-chip" data-cuisine="mexican" style="padding: 6px 12px; border-radius: 100px; border: 1px solid var(--color-border); background: white; font-size: 12px; cursor: pointer; white-space: nowrap;">🇲🇽 Mexico</button>
+        <button class="country-chip" data-cuisine="french" style="padding: 6px 12px; border-radius: 100px; border: 1px solid var(--color-border); background: white; font-size: 12px; cursor: pointer; white-space: nowrap;">🇫🇷 France</button>
+        <button class="country-chip" data-cuisine="moroccan" style="padding: 6px 12px; border-radius: 100px; border: 1px solid var(--color-border); background: white; font-size: 12px; cursor: pointer; white-space: nowrap;">🇲🇦 Morocco</button>
       </div>
     </div>
-    
-    <button class="drawer-plan-action-btn" id="ai-accept-plan-btn" data-localize="ai_concierge_action">
-      Plan dinner for today
-    </button>
+
+    <!-- AI Dynamic Recipes Feed -->
+    <div id="ai-recipes-container" style="display: flex; flex-direction: column; gap: 14px;">
+      <!-- Dynamic list elements rendered here -->
+    </div>
   `;
 
-  document.getElementById('ai-accept-plan-btn').addEventListener('click', () => {
-    planMealInOneTap('r1');
-    closeDrawer();
+  // Attach search event listeners
+  const searchBtn = document.getElementById('ai-drawer-search-btn');
+  const searchInput = document.getElementById('ai-drawer-search');
+  
+  const performSearch = () => {
+    const term = searchInput.value.trim().toLowerCase();
+    let matchKey = '';
+    if (term.includes('tunis') || term.includes('brik') || term.includes('ojja') || term.includes('couscous')) {
+      matchKey = 'tunisian';
+    } else if (term.includes('ital') || term.includes('risotto') || term.includes('pasta')) {
+      matchKey = 'italian';
+    } else if (term.includes('japan') || term.includes('sushi') || term.includes('soba')) {
+      matchKey = 'japanese';
+    } else if (term.includes('mexic') || term.includes('taco')) {
+      matchKey = 'mexican';
+    } else if (term.includes('french') || term.includes('rata')) {
+      matchKey = 'french';
+    } else if (term.includes('moroc') || term.includes('tagine')) {
+      matchKey = 'moroccan';
+    }
+    
+    // Highlight the matching chip if any
+    document.querySelectorAll('.country-chip').forEach(chip => {
+      if (chip.dataset.cuisine === matchKey) {
+        chip.style.borderColor = 'var(--color-dusty-rose)';
+        chip.style.background = 'var(--color-dusty-rose-light)';
+      } else {
+        chip.style.borderColor = 'var(--color-border)';
+        chip.style.background = 'white';
+      }
+    });
+    
+    renderAIDrawerRecipes(matchKey, term);
+  };
+
+  searchBtn.addEventListener('click', performSearch);
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') performSearch();
   });
 
-  openDrawer();
+  // Country Chips event listeners
+  document.querySelectorAll('.country-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.country-chip').forEach(c => {
+        c.style.borderColor = 'var(--color-border)';
+        c.style.background = 'white';
+      });
+      chip.style.borderColor = 'var(--color-dusty-rose)';
+      chip.style.background = 'var(--color-dusty-rose-light)';
+      
+      const cuisineKey = chip.dataset.cuisine;
+      searchInput.value = cuisineKey.charAt(0).toUpperCase() + cuisineKey.slice(1);
+      renderAIDrawerRecipes(cuisineKey);
+    });
+  });
+
+  // Load initial if passed
+  if (activeCuisineKey) {
+    const activeChip = document.querySelector(`.country-chip[data-cuisine="${activeCuisineKey}"]`);
+    if (activeChip) {
+      activeChip.style.borderColor = 'var(--color-dusty-rose)';
+      activeChip.style.background = 'var(--color-dusty-rose-light)';
+    }
+    renderAIDrawerRecipes(activeCuisineKey);
+  } else {
+    // Show a warm default prompt suggestions
+    renderAIDrawerRecipes('');
+  }
+}
+
+function renderAIDrawerRecipes(cuisineKey, customQuery = '') {
+  const container = document.getElementById('ai-recipes-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  if (!cuisineKey) {
+    // Initial standard assistant suggestion
+    container.innerHTML = `
+      <div style="background-color: var(--color-champagne-bg); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.5; color: var(--color-text-charcoal); border: 1px dashed var(--color-dusty-rose);">
+        <p>✨ <strong>Personal Concierge tip:</strong> Try typing <em>"Tunisia"</em> or selecting a chip above. I will automatically compile a customized culinary collection with all traditional recipes and their ingredients for you to plan in one tap.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const list = cuisineDatabase[cuisineKey] || [];
+  if (list.length === 0) {
+    container.innerHTML = `
+      <p style="font-size: 13px; color: var(--color-text-muted); text-align: center; margin-top: 10px;">
+        No specific recipes found for that query. Try "Tunisia" or "Italy".
+      </p>
+    `;
+    return;
+  }
+
+  list.forEach(recipe => {
+    const recipeDiv = document.createElement('div');
+    recipeDiv.style.backgroundColor = 'white';
+    recipeDiv.style.border = '1px solid var(--color-border)';
+    recipeDiv.style.borderRadius = '16px';
+    recipeDiv.style.padding = '14px';
+    recipeDiv.style.boxShadow = 'var(--shadow-soft)';
+    recipeDiv.style.display = 'flex';
+    recipeDiv.style.flexDirection = 'column';
+    recipeDiv.style.gap = '8px';
+
+    recipeDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <span style="font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--color-sage-green); letter-spacing: 0.5px;">${recipe.culture}</span>
+          <h4 style="font-family: var(--font-serif); font-size: 16px; color: var(--color-text-charcoal); margin-top: 2px;">${recipe.title}</h4>
+        </div>
+        <span style="font-size: 11px; color: var(--color-text-muted); font-weight: 500;">${recipe.prepTime} | ${recipe.calories}</span>
+      </div>
+      
+      <div>
+        <span style="font-size: 11px; font-weight: 600; color: var(--color-text-muted);">Ingredients:</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+          ${recipe.ingredients.map(ing => `
+            <span style="font-size: 10px; background: var(--color-sage-green-light); color: var(--color-sage-green); padding: 2px 8px; border-radius: 100px; font-weight: 500;">
+              ${ing}
+            </span>
+          `).join('')}
+        </div>
+      </div>
+
+      <button class="ai-drawer-plan-btn" data-recipe-title="${recipe.title}" style="background-color: var(--color-dusty-rose); color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-top: 6px; display: flex; align-items: center; gap: 4px; transition: var(--transition-smooth);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i> Add to Today's Planner
+      </button>
+    `;
+
+    // Bind Plan click in AI drawer
+    recipeDiv.querySelector('.ai-drawer-plan-btn').addEventListener('click', () => {
+      const dateStr = `2026-07-${String(state.todayDate).padStart(2, '0')}`;
+      if (!state.scheduledMeals[dateStr]) {
+        state.scheduledMeals[dateStr] = [];
+      }
+      state.scheduledMeals[dateStr].push({
+        time: 'dinner',
+        title: recipe.title,
+        type: 'ai-recipe',
+        id: recipe.id
+      });
+      
+      showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${recipe.title}`);
+      renderCalendar();
+      renderWeeklyWidget();
+      updateTodayDashboardCard();
+      closeDrawer();
+    });
+
+    container.appendChild(recipeDiv);
+  });
+  
+  lucide.createIcons();
 }
 
 // --- Drawer Open/Close UI Helper ---

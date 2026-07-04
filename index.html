@@ -58,10 +58,16 @@
         <h1 class="header-greeting" id="header-greeting">Hello, Beautiful</h1>
         <p class="header-subtitle" data-localize="header_subtitle">Your culinary menu is ready</p>
       </div>
-      <button class="notification-btn" id="concierge-trigger" title="AI Concierge Notification">
-        <i data-lucide="sparkles"></i>
-        <span class="notification-badge"></span>
-      </button>
+      <div style="display: flex; gap: 8px; align-items: center; z-index: 10;">
+        <button class="lang-switcher-btn" id="header-lang-btn" title="Change Language">
+          <i data-lucide="globe"></i>
+          <span id="header-lang-label">EN</span>
+        </button>
+        <button class="notification-btn" id="concierge-trigger" title="AI Concierge Notification">
+          <i data-lucide="sparkles"></i>
+          <span class="notification-badge"></span>
+        </button>
+      </div>
     </header>
 
     <!-- Main Content Area with Routing Views -->

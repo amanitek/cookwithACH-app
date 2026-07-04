@@ -192,6 +192,35 @@ body {
   transform: scale(0.92);
 }
 
+.lang-switcher-btn {
+  background: white;
+  border: 1px solid var(--color-border);
+  padding: 0 10px;
+  height: 38px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  font-family: var(--font-sans);
+  font-size: 11px;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+.lang-switcher-btn:active {
+  transform: scale(0.92);
+}
+
+.lang-switcher-btn svg {
+  width: 14px;
+  height: 14px;
+  color: var(--color-sage-green);
+}
+
 .notification-btn svg {
   width: 18px;
   height: 18px;

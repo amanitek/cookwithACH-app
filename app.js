@@ -248,6 +248,10 @@ const dom = {
   plannedCount: document.getElementById('planned-count-badge'),
   monthDisplay: document.getElementById('current-month-display'),
   
+  // Header Language Switcher
+  headerLangBtn: document.getElementById('header-lang-btn'),
+  headerLangLabel: document.getElementById('header-lang-label'),
+  
   // Controls & Settings
   regionSelect: document.getElementById('setting-region'),
   langButtons: document.querySelectorAll('#setting-lang .toggle-btn'),
@@ -304,6 +308,14 @@ document.addEventListener('DOMContentLoaded', () => {
       renderDiscoveryFeed();
     });
   });
+
+  // Setup Header Language Switcher
+  if (dom.headerLangBtn) {
+    dom.headerLangBtn.addEventListener('click', () => {
+      state.lang = state.lang === 'en' ? 'fr' : (state.lang === 'fr' ? 'es' : 'en');
+      updateLocalization();
+    });
+  }
 
   // 4. Setup Settings Listeners
   dom.regionSelect.addEventListener('change', (e) => {
@@ -825,6 +837,24 @@ const cuisineDatabase = {
       image: 'assets/pastry.jpg',
       culture: 'Tunisian Coastline',
       ingredients: ['Malsouka pastry sheets', 'Canned Tuna', 'Egg', 'Fresh Parsley', 'Capers', 'Lemon juice']
+    },
+    {
+      id: 'tun4',
+      title: 'Tunisian Lablabi Chickpea Soup',
+      calories: '380 kcal',
+      prepTime: '25 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Street Food',
+      ingredients: ['Chickpeas', 'Crusty Bread', 'Cumin', 'Harissa Paste', 'Poached Egg', 'Olive Oil', 'Garlic']
+    },
+    {
+      id: 'tun5',
+      title: 'Grilled Mechouia Salad Plate',
+      calories: '210 kcal',
+      prepTime: '30 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Oasis',
+      ingredients: ['Grilled Peppers', 'Grilled Tomatoes', 'Garlic', 'Tuna chunks', 'Hard Boiled Egg', 'Olive Oil']
     }
   ],
   italian: [
@@ -845,6 +875,24 @@ const cuisineDatabase = {
       image: 'assets/pantry.jpg',
       culture: 'Tuscan Countryside',
       ingredients: ['Rustic Bread', 'Ripe Tomatoes', 'Fresh Garlic', 'Extra Virgin Olive Oil', 'Fresh Basil']
+    },
+    {
+      id: 'it3',
+      title: 'Fettuccine Truffle Alfredo',
+      calories: '460 kcal',
+      prepTime: '20 mins',
+      image: 'assets/pastry.jpg',
+      culture: 'Roman Traditional',
+      ingredients: ['Fettuccine Pasta', 'Truffle Butter', 'Parmigiano Reggiano', 'Heavy Cream', 'Garlic']
+    },
+    {
+      id: 'it4',
+      title: 'Tuscan Ribollita Soup',
+      calories: '310 kcal',
+      prepTime: '40 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Florentine Rustic',
+      ingredients: ['Cannellini Beans', 'Lacinato Kale', 'Carrots', 'Stale Bread', 'Tomatoes', 'Rosemary']
     }
   ],
   japanese: [
@@ -865,6 +913,24 @@ const cuisineDatabase = {
       image: 'assets/pantry.jpg',
       culture: 'Kyoto Green Hills',
       ingredients: ['Matcha Buckwheat Noodles', 'Tsuyu Dipping Sauce', 'Scallions', 'Sesame Seeds', 'Wasabi']
+    },
+    {
+      id: 'jp3',
+      title: 'Silken Agedashi Tofu',
+      calories: '220 kcal',
+      prepTime: '18 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Japanese Temple',
+      ingredients: ['Silken Tofu', 'Potato Starch', 'Warm Dashi', 'Grated Daikon', 'Scallions', 'Ginger']
+    },
+    {
+      id: 'jp4',
+      title: 'Sweet Miso Glazed Nasu Aubergine',
+      calories: '240 kcal',
+      prepTime: '22 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Osaka Street Food',
+      ingredients: ['Eggplants', 'Sweet Miso Paste', 'Mirin', 'Toasted Sesame Seeds', 'Green Scallions']
     }
   ],
   mexican: [
@@ -876,6 +942,33 @@ const cuisineDatabase = {
       image: 'assets/pantry.jpg',
       culture: 'Oaxacan Street Food',
       ingredients: ['Corn Tortillas', 'Black Beans', 'Smashed Avocado', 'Fresh Cilantro', 'Lime juice', 'Cotija Cheese']
+    },
+    {
+      id: 'mx2',
+      title: 'Chipotle Roasted Potato Quesadilla',
+      calories: '410 kcal',
+      prepTime: '20 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Puebla Comfort',
+      ingredients: ['Flour Tortillas', 'Roasted Sweet Potato', 'Chipotle Sauce', 'Monterey Jack Cheese', 'Sour Cream']
+    },
+    {
+      id: 'mx3',
+      title: 'Enchiladas Verdes with Salsa Verde',
+      calories: '430 kcal',
+      prepTime: '30 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Guadalajara Style',
+      ingredients: ['Corn Tortillas', 'Tomatillo Verde Salsa', 'Cotija Cheese', 'Sour Cream', 'Fresh Cilantro']
+    },
+    {
+      id: 'mx4',
+      title: 'Cheese Stuffed Chiles Rellenos',
+      calories: '390 kcal',
+      prepTime: '35 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Veracruz Coastal',
+      ingredients: ['Poblano Peppers', 'Monterey Jack Cheese', 'Egg Batter', 'Spiced Tomato Salsa']
     }
   ],
   french: [
@@ -887,6 +980,33 @@ const cuisineDatabase = {
       image: 'assets/pantry.jpg',
       culture: 'French Riviera',
       ingredients: ['Eggplant', 'Zucchini', 'Yellow Squash', 'Bell Peppers', 'Herbes de Provence', 'Olive Oil']
+    },
+    {
+      id: 'fr2',
+      title: 'French Onion Soup Gratinée',
+      calories: '340 kcal',
+      prepTime: '50 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Parisian Bistro',
+      ingredients: ['Onions', 'Beef Broth', 'French Baguette', 'Gruyère Cheese', 'Fresh Thyme']
+    },
+    {
+      id: 'fr3',
+      title: 'Spinach & Gruyère Savory Quiche',
+      calories: '390 kcal',
+      prepTime: '40 mins',
+      image: 'assets/pastry.jpg',
+      culture: 'Alsatian Countryside',
+      ingredients: ['Butter Puff Pastry', 'Fresh Eggs', 'Organic Spinach', 'Gruyère Cheese', 'Nutmeg']
+    },
+    {
+      id: 'fr4',
+      title: 'Boutique Chocolate Soufflé',
+      calories: '280 kcal',
+      prepTime: '30 mins',
+      image: 'assets/pastry.jpg',
+      culture: 'French Pastry Shop',
+      ingredients: ['Dark Chocolate', 'Eggs', 'Sugar', 'Butter', 'Vanilla Extract']
     }
   ],
   moroccan: [
@@ -898,6 +1018,33 @@ const cuisineDatabase = {
       image: 'assets/pantry.jpg',
       culture: 'Moroccan Medina',
       ingredients: ['Chickpeas', 'Dried Apricots', 'Butternut Squash', 'Moroccan Cumin & Cinnamon', 'Toasted Almonds']
+    },
+    {
+      id: 'mor2',
+      title: 'Moroccan Harira Lentil Soup',
+      calories: '310 kcal',
+      prepTime: '30 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Marrakech Souk',
+      ingredients: ['Brown Lentils', 'Chickpeas', 'Tomato Puree', 'Fresh Ginger', 'Fresh Cilantro', 'Cumin']
+    },
+    {
+      id: 'mor3',
+      title: 'Fragrant Couscous Tfaya',
+      calories: '420 kcal',
+      prepTime: '40 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Moroccan Palace',
+      ingredients: ['Couscous Semolina', 'Caramelized Onions', 'Raisins', 'Cinnamon', 'Toasted Almonds']
+    },
+    {
+      id: 'mor4',
+      title: 'Zaatar Roasted Cauliflower Bowl',
+      calories: '270 kcal',
+      prepTime: '25 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Moroccan Coast',
+      ingredients: ['Cauliflower Florets', 'Zaatar Seasoning', 'Creamy Tahini', 'Pomegranate Seeds', 'Parsley']
     }
   ]
 };
@@ -1204,6 +1351,22 @@ function updateLocalization() {
     es: 'Hola, Alexandra'
   };
   dom.headerGreeting.textContent = greetings[state.lang];
+
+  // Sync Header lang switcher label
+  if (dom.headerLangLabel) {
+    dom.headerLangLabel.textContent = state.lang.toUpperCase();
+  }
+
+  // Sync settings page language switcher toggles
+  if (dom.langButtons) {
+    dom.langButtons.forEach(btn => {
+      if (btn.dataset.lang === state.lang) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
 
   // Map each HTML tag with [data-localize] to corresponding translation key
   const elements = document.querySelectorAll('[data-localize]');

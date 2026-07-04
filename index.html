@@ -288,7 +288,37 @@
       <button class="modal-btn primary" id="modal-save-btn" data-localize="modal_save">Schedule</button>
     </div>
   </div>
-
+  <!-- Pantry Item CRUD Modal -->
+  <div class="modal-overlay" id="pantry-modal-overlay"></div>
+  <div class="modal" id="pantry-item-modal">
+    <h3 class="modal-title" id="pantry-modal-title">Add Ingredient</h3>
+    
+    <label style="font-size: 11px; font-weight:600; color:var(--color-text-muted); margin-bottom: 4px; display: block;">Ingredient Name</label>
+    <input type="text" id="pantry-item-name" placeholder="E.g., Fresh Basil" class="modal-input">
+    
+    <label style="font-size: 11px; font-weight:600; color:var(--color-text-muted); margin-bottom: 4px; display: block;">Quantity / Volume</label>
+    <input type="text" id="pantry-item-qty" placeholder="E.g., 2 bunches" class="modal-input">
+    
+    <label style="font-size: 11px; font-weight:600; color:var(--color-text-muted); margin-bottom: 4px; display: block;">Emoji Icon</label>
+    <select id="pantry-item-emoji" class="settings-select" style="width: 100%; margin-bottom: 20px; padding: 10px; border-radius: 12px; height: 38px;">
+      <option value="🌿">🌿 Herbs</option>
+      <option value="🥑">🥑 Avocado</option>
+      <option value="🐟">🐟 Fish/Seafood</option>
+      <option value="🍅">🍅 Tomato</option>
+      <option value="🍋">🍋 Lemon/Citrus</option>
+      <option value="🥬">🥬 Greens</option>
+      <option value="🥚">🥚 Eggs</option>
+      <option value="🧀">🧀 Cheese</option>
+      <option value="🥩">🥩 Meat</option>
+      <option value="🍎">🍎 Fruit</option>
+      <option value="🍶">🍶 Yogurt/Dairy</option>
+    </select>
+    
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="pantry-modal-cancel-btn">Cancel</button>
+      <button class="modal-btn primary" id="pantry-modal-save-btn">Save</button>
+    </div>
+  </div>
   <!-- Toast Notification -->
   <div class="toast" id="toast-notification">
     <i data-lucide="check-circle" class="toast-icon"></i>

@@ -295,6 +295,17 @@ const dom = {
   headerLangBtn: document.getElementById('header-lang-btn'),
   headerLangLabel: document.getElementById('header-lang-label'),
   
+  // Pantry CRUD Dialog Elements
+  addPantryItemBtn: document.getElementById('add-pantry-item-btn'),
+  pantryModalOverlay: document.getElementById('pantry-modal-overlay'),
+  pantryModal: document.getElementById('pantry-item-modal'),
+  pantryModalTitle: document.getElementById('pantry-modal-title'),
+  pantryItemNameInput: document.getElementById('pantry-item-name'),
+  pantryItemQtyInput: document.getElementById('pantry-item-qty'),
+  pantryItemEmojiSelect: document.getElementById('pantry-item-emoji'),
+  pantryModalCancelBtn: document.getElementById('pantry-modal-cancel-btn'),
+  pantryModalSaveBtn: document.getElementById('pantry-modal-save-btn'),
+  
   // Controls & Settings
   regionSelect: document.getElementById('setting-region'),
   langButtons: document.querySelectorAll('#setting-lang .toggle-btn'),
@@ -325,6 +336,9 @@ const dom = {
 
 // Variable to track which calendar day cell is currently being quick-edited
 let selectedCalendarDay = null;
+
+// Track editing state for pantry CRUD
+let editingPantryItemId = null;
 
 // --- Initialize App ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -404,7 +418,19 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.add('active');
     });
   });
-  dom.modalSaveBtn.addEventListener('click', saveModalMeal);
+  // Setup Pantry CRUD Modal Events
+  if (dom.addPantryItemBtn) {
+    dom.addPantryItemBtn.addEventListener('click', () => showPantryModal());
+  }
+  if (dom.pantryModalOverlay) {
+    dom.pantryModalOverlay.addEventListener('click', closePantryModal);
+  }
+  if (dom.pantryModalCancelBtn) {
+    dom.pantryModalCancelBtn.addEventListener('click', closePantryModal);
+  }
+  if (dom.pantryModalSaveBtn) {
+    dom.pantryModalSaveBtn.addEventListener('click', savePantryItem);
+  }
 
   // 7. Initial Data Renders
   renderPantry();
@@ -450,8 +476,13 @@ function renderPantry() {
     let displayName = item.name;
     if (state.lang === 'fr') displayName = item.name_fr;
     if (state.lang === 'es') displayName = item.name_es;
+    if (state.lang === 'ar') displayName = item.name_ar || item.name;
 
     card.innerHTML = `
+      <div class="pantry-card-actions">
+        <button class="pantry-card-btn edit-item" title="Edit"><i data-lucide="edit-2"></i></button>
+        <button class="pantry-card-btn delete delete-item" title="Delete"><i data-lucide="trash-2"></i></button>
+      </div>
       <div class="pantry-icon-container">${item.icon}</div>
       <div class="pantry-name">${displayName}</div>
       <div class="pantry-qty">${item.qty}</div>
@@ -463,7 +494,7 @@ function renderPantry() {
 
     // Click pantry card triggers details
     card.addEventListener('click', (e) => {
-      if (e.target.closest('.pantry-btn-plan')) return;
+      if (e.target.closest('.pantry-btn-plan') || e.target.closest('.pantry-card-actions')) return;
       openPantryDetails(item);
     });
 
@@ -473,9 +504,105 @@ function renderPantry() {
       planMealInOneTap(item.matchRecipe);
     });
 
+    // Edit button click
+    card.querySelector('.edit-item').addEventListener('click', (e) => {
+      e.stopPropagation();
+      showPantryModal(item.id);
+    });
+
+    // Delete button click
+    card.querySelector('.delete-item').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deletePantryItem(item.id);
+    });
+
     dom.pantryGrid.appendChild(card);
   });
   lucide.createIcons();
+}
+
+// --- Pantry CRUD Helpers ---
+function deletePantryItem(id) {
+  const index = state.pantryItems.findIndex(i => i.id === id);
+  if (index !== -1) {
+    const name = state.pantryItems[index].name;
+    state.pantryItems.splice(index, 1);
+    showToast(`${name} removed from pantry`);
+    renderPantry();
+  }
+}
+
+function showPantryModal(id = null) {
+  if (dom.pantryModalOverlay && dom.pantryModal) {
+    dom.pantryModalOverlay.classList.add('active');
+    dom.pantryModal.classList.add('active');
+    
+    if (id) {
+      editingPantryItemId = id;
+      const item = state.pantryItems.find(i => i.id === id);
+      if (item) {
+        dom.pantryModalTitle.textContent = state.lang === 'fr' ? 'Modifier l\'ingrédient' : (state.lang === 'es' ? 'Editar ingrediente' : (state.lang === 'ar' ? 'تعديل المكون' : 'Edit Ingredient'));
+        dom.pantryItemNameInput.value = item.name;
+        dom.pantryItemQtyInput.value = item.qty;
+        dom.pantryItemEmojiSelect.value = item.icon;
+      }
+    } else {
+      editingPantryItemId = null;
+      dom.pantryModalTitle.textContent = state.lang === 'fr' ? 'Ajouter un ingrédient' : (state.lang === 'es' ? 'Agregar ingrediente' : (state.lang === 'ar' ? 'إضافة مكون جديد' : 'Add Ingredient'));
+      dom.pantryItemNameInput.value = '';
+      dom.pantryItemQtyInput.value = '';
+      dom.pantryItemEmojiSelect.value = '🌿';
+    }
+    dom.pantryItemNameInput.focus();
+  }
+}
+
+function closePantryModal() {
+  if (dom.pantryModalOverlay && dom.pantryModal) {
+    dom.pantryModalOverlay.classList.remove('active');
+    dom.pantryModal.classList.remove('active');
+    editingPantryItemId = null;
+  }
+}
+
+function savePantryItem() {
+  const name = dom.pantryItemNameInput.value.trim();
+  const qty = dom.pantryItemQtyInput.value.trim();
+  const emoji = dom.pantryItemEmojiSelect.value;
+
+  if (!name || !qty) {
+    showToast('Please enter name and quantity');
+    return;
+  }
+
+  if (editingPantryItemId) {
+    const item = state.pantryItems.find(i => i.id === editingPantryItemId);
+    if (item) {
+      item.name = name;
+      item.name_fr = name;
+      item.name_es = name;
+      item.name_ar = name;
+      item.qty = qty;
+      item.icon = emoji;
+      showToast(`${name} updated successfully!`);
+    }
+  } else {
+    const newItem = {
+      id: 'p-' + Date.now(),
+      name: name,
+      name_fr: name,
+      name_es: name,
+      name_ar: name,
+      qty: qty,
+      icon: emoji,
+      matchRecipe: 'r1'
+    };
+    state.pantryItems.push(newItem);
+    showToast(`${name} added to pantry!`);
+  }
+
+  closePantryModal();
+  renderPantry();
 }
 
 // --- One-Tap Quick Plan Logic ---

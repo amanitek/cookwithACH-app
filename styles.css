@@ -468,6 +468,52 @@ body {
   border-color: var(--color-sage-green);
 }
 
+.pantry-card-actions {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  opacity: 0.6;
+  transition: var(--transition-smooth);
+}
+
+.pantry-item:hover .pantry-card-actions {
+  opacity: 1;
+}
+
+.pantry-card-btn {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: var(--transition-smooth);
+}
+
+.pantry-card-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.pantry-card-btn:hover {
+  background-color: var(--color-dusty-rose-light);
+  color: var(--color-dusty-rose);
+  border-color: var(--color-dusty-rose);
+}
+
+.pantry-card-btn.delete:hover {
+  background-color: #FEE2E2;
+  color: #DC2626;
+  border-color: #FCA5A5;
+}
+
 .pantry-item.selected {
   border-color: var(--color-dusty-rose);
   background-color: var(--color-dusty-rose-light);

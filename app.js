@@ -1768,13 +1768,31 @@ function triggerBatchCookingPlan() {
     storageTitle = 'تعليمات الحفظ والتخزين';
   }
 
-  // Pre-selected batch recipes
-  const batchMeals = [
-    { title: 'Tunisian Royal Couscous', category: 'mains', day: 5 }, // Friday
-    { title: 'Porcini Mushroom Risotto', category: 'mains', day: 6 }, // Saturday
-    { title: 'Provencal Vegetable Ratatouille', category: 'mains', day: 7 }, // Sunday
-    { title: 'Cucumber Dill Yogurt Bowl', category: 'light', day: 8 } // Monday
-  ];
+  // Dynamically select top 4 recipes matching the pantry ingredients
+  const matchedBatch = getBatchCookingRecipes();
+  const daySchedule = [5, 6, 7, 8]; // Friday, Saturday, Sunday, Monday
+  const dayLabels = {
+    en: ['Friday Dinner', 'Saturday Dinner', 'Sunday Dinner', 'Monday Lunch'],
+    fr: ['Vendredi Dîner', 'Samedi Dîner', 'Dimanche Dîner', 'Lundi Déjeuner'],
+    es: ['Viernes Cena', 'Sábado Cena', 'Domingo Cena', 'Lunes Almuerzo'],
+    ar: ['عشاء الجمعة', 'عشاء السبت', 'عشاء الأحد', 'غداء الاثنين']
+  };
+
+  const menuItemsHTML = matchedBatch.map((item, idx) => {
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; font-size:11px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.05);">
+        <div style="max-width: 70%;">
+          <strong style="color:var(--color-text-charcoal);">${item.title}</strong>
+          <div style="font-size: 9px; color: var(--color-sage-green); margin-top: 2px;">
+            ✓ Matches: ${item.score} pantry items
+          </div>
+        </div>
+        <span style="font-size: 10px; color: var(--color-text-muted); background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--color-border); font-weight:500;">
+          ${dayLabels[state.lang][idx]}
+        </span>
+      </div>
+    `;
+  }).join('');
 
   dom.drawerContent.innerHTML = `
     <div class="drawer-header" style="margin-bottom: 12px;">
@@ -1791,23 +1809,8 @@ function triggerBatchCookingPlan() {
     <!-- Planned Menu Overview -->
     <div style="background-color: var(--color-champagne-bg); border-radius: 16px; padding: 14px; margin-bottom: 16px; border: 1px solid var(--color-border);">
       <strong style="font-size: 12px; color: var(--color-text-charcoal); display: block; margin-bottom: 8px;">📋 Target Weekly Menu:</strong>
-      <div style="display:flex; flex-direction:column; gap:8px;">
-        <div style="display:flex; justify-content:space-between; font-size:11px;">
-          <span>🇹🇳 <strong>Tunisian Royal Couscous</strong></span>
-          <span style="color: var(--color-text-muted);">Friday Dinner</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px;">
-          <span>🇮🇹 <strong>Porcini Mushroom Risotto</strong></span>
-          <span style="color: var(--color-text-muted);">Saturday Dinner</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px;">
-          <span>🇫🇷 <strong>Provencal Vegetable Ratatouille</strong></span>
-          <span style="color: var(--color-text-muted);">Sunday Dinner</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:11px;">
-          <span>🍶 <strong>Cucumber Dill Yogurt Bowl</strong></span>
-          <span style="color: var(--color-text-muted);">Monday Lunch</span>
-        </div>
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        ${menuItemsHTML}
       </div>
     </div>
 
@@ -1838,16 +1841,17 @@ function triggerBatchCookingPlan() {
 
   // Attach listener to Schedule All
   document.getElementById('ai-batch-schedule-btn').addEventListener('click', () => {
-    batchMeals.forEach(meal => {
-      const dateStr = `2026-07-${String(meal.day).padStart(2, '0')}`;
+    matchedBatch.forEach((item, idx) => {
+      const day = daySchedule[idx];
+      const dateStr = `2026-07-${String(day).padStart(2, '0')}`;
       if (!state.scheduledMeals[dateStr]) {
         state.scheduledMeals[dateStr] = [];
       }
       state.scheduledMeals[dateStr].push({
-        time: meal.category === 'light' ? 'lunch' : 'dinner',
-        title: meal.title,
+        time: item.category === 'light' ? 'lunch' : 'dinner',
+        title: item.title,
         type: 'batch-cook',
-        id: 'batch-' + Date.now() + '-' + meal.day
+        id: 'batch-' + Date.now() + '-' + day
       });
     });
 
@@ -1863,6 +1867,81 @@ function triggerBatchCookingPlan() {
   });
 
   openDrawer();
+}
+
+function getBatchCookingRecipes() {
+  const pantryNames = state.pantryItems.map(item => {
+    let name = item.name;
+    if (state.lang === 'fr' && item.name_fr) name = item.name_fr;
+    if (state.lang === 'es' && item.name_es) name = item.name_es;
+    if (state.lang === 'ar' && item.name_ar) name = item.name_ar;
+    return name.toLowerCase();
+  });
+
+  // Gather all recipes
+  const allRecipes = [...state.recipes];
+  Object.values(cuisineDatabase).forEach(list => {
+    allRecipes.push(...list);
+  });
+
+  // Calculate score for each recipe
+  const scoredRecipes = allRecipes.map(recipe => {
+    let titleStr = '';
+    if (typeof recipe.title === 'string') {
+      titleStr = recipe.title;
+    } else {
+      titleStr = recipe.title[state.region] || recipe.title.Mediterranean;
+    }
+
+    let recipeIngs = [];
+    if (Array.isArray(recipe.ingredients)) {
+      recipeIngs = recipe.ingredients;
+    } else if (recipe.ingredients && recipe.ingredients[state.lang]) {
+      recipeIngs = recipe.ingredients[state.lang];
+    } else if (recipe.ingredients && recipe.ingredients.en) {
+      recipeIngs = recipe.ingredients.en;
+    } else {
+      recipeIngs = [];
+    }
+
+    let matches = 0;
+    recipeIngs.forEach(ing => {
+      const isMatched = pantryNames.some(pName => ing.toLowerCase().includes(pName) || pName.includes(ing.toLowerCase()));
+      if (isMatched) {
+        matches++;
+      }
+    });
+
+    return {
+      recipe,
+      title: titleStr,
+      ingredients: recipeIngs,
+      score: matches,
+      category: recipe.category || 'mains'
+    };
+  });
+
+  // Sort descending by match score
+  scoredRecipes.sort((a, b) => b.score - a.score);
+
+  // Return the top 4 best-matching recipes (unique)
+  const uniqueBatch = [];
+  const titlesSeen = new Set();
+  
+  for (const item of scoredRecipes) {
+    if (!titlesSeen.has(item.title)) {
+      titlesSeen.add(item.title);
+      uniqueBatch.push(item);
+    }
+    if (uniqueBatch.length === 4) break;
+  }
+
+  // Fallback to fill 4 meals
+  while (uniqueBatch.length < 4 && allRecipes.length > 0) {
+    uniqueBatch.push(scoredRecipes[uniqueBatch.length % scoredRecipes.length]);
+  }
+
+  return uniqueBatch;
 }
 
 // --- Translation/Localization Core ---

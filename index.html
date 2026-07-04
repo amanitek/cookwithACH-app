@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>cookwithACH — Elegant Meal Planning</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Custom Styling -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Loading / Splash Screen -->
+  <div id="splash-screen" class="splash-screen">
+    <div class="splash-content">
+      <img src="assets/logo.png" alt="cookwithACH Logo" class="splash-logo">
+      <div class="spinner-container">
+        <!-- Circular floral SVG spinner element -->
+        <svg class="floral-spinner" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#D4A396" stroke-width="2" stroke-dasharray="10 15" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(0 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(45 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(90 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(135 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(180 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(225 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(270 50 50)" />
+          <path d="M 50 10 C 45 25, 55 25, 50 10 Z" fill="#8F9E8B" transform="rotate(315 50 50)" />
+        </svg>
+      </div>
+      <p class="splash-tagline" data-localize="loading_tagline">Tailoring your culinary concierge...</p>
+    </div>
+  </div>
+
+  <!-- Main Mobile Container -->
+  <div class="mobile-frame">
+    <!-- Status Bar Simulation -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <i data-lucide="signal" class="status-icon"></i>
+        <i data-lucide="wifi" class="status-icon"></i>
+        <i data-lucide="battery" class="status-icon"></i>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-logo-container">
+        <img src="assets/logo.png" alt="cookwithACH Logo" class="app-logo">
+      </div>
+      <div class="header-info">
+        <h1 class="header-greeting" id="header-greeting">Hello, Beautiful</h1>
+        <p class="header-subtitle" data-localize="header_subtitle">Your culinary menu is ready</p>
+      </div>
+      <button class="notification-btn" id="concierge-trigger" title="AI Concierge Notification">
+        <i data-lucide="sparkles"></i>
+        <span class="notification-badge"></span>
+      </button>
+    </header>
+
+    <!-- Main Content Area with Routing Views -->
+    <main class="content-container">
+
+      <!-- SCREEN 1: DASHBOARD -->
+      <section id="screen-dashboard" class="screen-view active">
+        <!-- AI Prompt Search Trigger -->
+        <div class="search-section">
+          <div class="search-box">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="search-input" placeholder="What are you craving tonight?" data-placeholder="search_placeholder">
+            <button class="ai-button" id="ai-generate-btn" title="Ask cookwithACH AI">
+              <i data-lucide="wand-2"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Dynamic Announcement Card -->
+        <div class="concierge-card">
+          <div class="concierge-card-content">
+            <div class="concierge-badge">
+              <i data-lucide="calendar"></i>
+              <span data-localize="concierge_today">Today's Focus</span>
+            </div>
+            <h3 class="concierge-title" id="today-plan-title">No meals planned yet</h3>
+            <p class="concierge-desc" id="today-plan-desc">Select an ingredient from My Pantry below or explore recipes to schedule dinner.</p>
+          </div>
+          <div class="concierge-action">
+            <i data-lucide="chevron-right"></i>
+          </div>
+        </div>
+
+        <!-- "My Pantry" Snapshot -->
+        <div class="pantry-section">
+          <div class="section-header">
+            <h2 class="section-title" data-localize="pantry_title">My Pantry</h2>
+            <span class="section-action" id="add-pantry-item-btn"><i data-lucide="plus"></i> Add</span>
+          </div>
+          <p class="section-desc" data-localize="pantry_desc">Tap an ingredient for quick-plan matching, or plan it in one tap.</p>
+          
+          <div class="pantry-grid" id="pantry-grid">
+            <!-- Dynamic Pantry Items Rendered in app.js -->
+          </div>
+        </div>
+
+        <!-- Quick Weekly Overview Widget -->
+        <div class="weekly-widget-section">
+          <h2 class="section-title" data-localize="weekly_title">This Week</h2>
+          <div class="weekly-row" id="weekly-overview-row">
+            <!-- Dynamic days will be rendered here -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 2: RECIPE DISCOVERY -->
+      <section id="screen-discovery" class="screen-view">
+        <div class="discovery-header">
+          <h2 class="section-title" data-localize="discovery_title">Recipe Discovery</h2>
+          <div class="filter-chips" id="filter-chips">
+            <button class="chip active" data-filter="all" data-localize="filter_all">All</button>
+            <button class="chip" data-filter="mains" data-localize="filter_mains">Mains</button>
+            <button class="chip" data-filter="light" data-localize="filter_light">Light Eats</button>
+            <button class="chip" data-filter="sweet" data-localize="filter_sweet">Sweet Tarts</button>
+          </div>
+        </div>
+
+        <div class="recipe-feed" id="recipe-feed">
+          <!-- Dynamic Recipe Cards Rendered in app.js -->
+        </div>
+      </section>
+
+      <!-- SCREEN 3: ACH PLANNER -->
+      <section id="screen-planner" class="screen-view">
+        <div class="planner-header">
+          <div class="planner-title-row">
+            <h2 class="section-title" data-localize="planner_title">ACH Planner</h2>
+            <div class="planner-stats">
+              <span id="planned-count-badge">0 planned</span>
+            </div>
+          </div>
+          
+          <div class="month-selector">
+            <button class="month-nav-btn" id="prev-month-btn"><i data-lucide="chevron-left"></i></button>
+            <span class="current-month" id="current-month-display">July 2026</span>
+            <button class="month-nav-btn" id="next-month-btn"><i data-lucide="chevron-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Full Month Calendar Grid -->
+        <div class="calendar-container">
+          <!-- Day of week headers -->
+          <div class="calendar-weekdays">
+            <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+          </div>
+          <!-- 31 Days Grid -->
+          <div class="calendar-grid" id="calendar-grid">
+            <!-- Rendered by app.js -->
+          </div>
+        </div>
+
+        <!-- Draggable Quick Drawer Shelf -->
+        <div class="quick-shelf">
+          <div class="shelf-header">
+            <span class="shelf-title" data-localize="shelf_title">Drag & Drop Meals</span>
+            <span class="shelf-hint" data-localize="shelf_hint">Drag onto any day cell</span>
+          </div>
+          <div class="shelf-items" id="shelf-items">
+            <!-- Draggable items rendered by app.js -->
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREEN 4: LOCALIZATION & SETTINGS -->
+      <section id="screen-settings" class="screen-view">
+        <h2 class="section-title" data-localize="settings_title">Concierge Settings</h2>
+        
+        <div class="settings-group">
+          <h3 class="settings-group-title" data-localize="group_regional">Regional Preferences</h3>
+          
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <label class="settings-label" data-localize="label_region">Culinary Region</label>
+              <span class="settings-desc" data-localize="desc_region">Influences default culture labeling & cards</span>
+            </div>
+            <select class="settings-select" id="setting-region">
+              <option value="Mediterranean">Mediterranean</option>
+              <option value="Asian Fusion">Asian Fusion</option>
+              <option value="Nordic Clean">Nordic Clean</option>
+              <option value="Latin Boutique">Latin Boutique</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3 class="settings-group-title" data-localize="group_language">Language & Tone</h3>
+          
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <label class="settings-label" data-localize="label_lang">App Language</label>
+              <span class="settings-desc" data-localize="desc_lang">Select UI localization language</span>
+            </div>
+            <div class="toggle-buttons" id="setting-lang">
+              <button class="toggle-btn active" data-lang="en">EN</button>
+              <button class="toggle-btn" data-lang="fr">FR</button>
+              <button class="toggle-btn" data-lang="es">ES</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h3 class="settings-group-title" data-localize="group_preferences">Aesthetic Theme</h3>
+          
+          <div class="settings-item">
+            <div class="settings-item-info">
+              <label class="settings-label" data-localize="label_theme">Color Atmosphere</label>
+              <span class="settings-desc" data-localize="desc_theme">Soft champagne or dusty rose tones</span>
+            </div>
+            <div class="toggle-buttons" id="setting-theme">
+              <button class="toggle-btn active" data-theme="champagne" data-localize="theme_champagne">Champagne</button>
+              <button class="toggle-btn" data-theme="rose" data-localize="theme_rose">Rose Soft</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Brand Emblem Bottom View -->
+        <div class="settings-footer">
+          <img src="assets/logo.png" alt="cookwithACH logo" class="settings-footer-logo">
+          <p class="settings-version">cookwithACH — v2.4 Premium Concierge</p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-target="dashboard">
+        <i data-lucide="home"></i>
+        <span data-localize="nav_dashboard">Dashboard</span>
+      </button>
+      <button class="nav-item" data-target="discovery">
+        <i data-lucide="compass"></i>
+        <span data-localize="nav_discovery">Discover</span>
+      </button>
+      <button class="nav-item" data-target="planner">
+        <i data-lucide="calendar"></i>
+        <span data-localize="nav_planner">Planner</span>
+      </button>
+      <button class="nav-item" data-target="settings">
+        <i data-lucide="settings"></i>
+        <span data-localize="nav_settings">Settings</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- Bottom Drawer: Recipe Details / Quick Planner -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <div class="bottom-drawer" id="bottom-drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-content" id="drawer-content">
+      <!-- Dynamic drawer content will render here -->
+    </div>
+  </div>
+
+  <!-- Quick Add Modal Popup -->
+  <div class="modal-overlay" id="modal-overlay"></div>
+  <div class="modal" id="quick-add-modal">
+    <h3 class="modal-title" data-localize="modal_title">Plan a Custom Meal</h3>
+    <input type="text" id="modal-meal-name" placeholder="E.g., Raspberry Chia Bowl" class="modal-input">
+    <div class="modal-time-selector">
+      <button class="modal-time-btn active" data-time="breakfast">Breakfast</button>
+      <button class="modal-time-btn" data-time="lunch">Lunch</button>
+      <button class="modal-time-btn" data-time="dinner">Dinner</button>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" id="modal-cancel-btn" data-localize="modal_cancel">Cancel</button>
+      <button class="modal-btn primary" id="modal-save-btn" data-localize="modal_save">Schedule</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast-notification">
+    <i data-lucide="check-circle" class="toast-icon"></i>
+    <span class="toast-message">Meal scheduled successfully!</span>
+  </div>
+
+  <!-- App Script -->
+  <script src="app.js"></script>
+</body>
+</html>

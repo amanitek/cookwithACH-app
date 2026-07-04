@@ -1364,12 +1364,113 @@ function renderAIDrawerRecipes(cuisineKey, customQuery = '') {
   container.innerHTML = '';
 
   if (!cuisineKey) {
-    // Initial standard assistant suggestion
+    // PANTRY OPTIMIZER AI: Propose meal matching current pantry items
+    const analysis = getPantryAIPrompt();
+    const recipe = analysis.recipe;
+    const title = recipe.resolvedTitle;
+    const matched = analysis.matched;
+    const unmatched = analysis.unmatched;
+
+    // Quality/Healthy Booster tips based on recipe category
+    let boosterTip = 'Add organic microgreens and cold-pressed extra virgin olive oil to increase healthy fats and antioxidants.';
+    if (recipe.category === 'sweet') {
+      boosterTip = 'Add organic chia seeds, wild honey, and ground flaxseeds to boost fiber and omega-3 quality.';
+    } else if (recipe.category === 'light') {
+      boosterTip = 'Add pumpkin seeds and organic spinach leaves to enrich mineral density and fiber content.';
+    }
+
     container.innerHTML = `
-      <div style="background-color: var(--color-champagne-bg); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.5; color: var(--color-text-charcoal); border: 1px dashed var(--color-dusty-rose);">
-        <p>✨ <strong>Personal Concierge tip:</strong> Try typing <em>"Tunisia"</em> or selecting a chip above. I will automatically compile a customized culinary collection with all traditional recipes and their ingredients for you to plan in one tap.</p>
+      <!-- Smart Pantry Matcher Card -->
+      <div style="background: linear-gradient(135deg, #FFF6F3, #FCF1EC); border: 1px solid rgba(212, 163, 150, 0.3); border-radius: 20px; padding: 18px; box-shadow: var(--shadow-soft); display: flex; flex-direction: column; gap: 12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size: 10px; font-weight: 600; text-transform: uppercase; background: var(--color-sage-green-light); color: var(--color-sage-green); padding: 4px 8px; border-radius: 100px; letter-spacing:0.5px;">
+            Pantry Match AI
+          </span>
+          <span style="font-size: 11px; color: var(--color-text-muted); font-weight: 500;">
+            ${matched.length} ingredients matching
+          </span>
+        </div>
+
+        <div>
+          <h3 style="font-family: var(--font-serif); font-size: 19px; color: var(--color-text-charcoal); margin-bottom: 2px;">
+            ${title}
+          </h3>
+          <p style="font-size: 11px; color: var(--color-text-muted); line-height: 1.4;">
+            Best healthy suggestion matching your active pantry inventory.
+          </p>
+        </div>
+
+        ${matched.length > 0 ? `
+          <div>
+            <strong style="font-size: 11px; color: var(--color-sage-green); display: block; margin-bottom: 6px;">✓ Utilizing from your Pantry:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              ${matched.map(ing => `<span style="font-size: 10px; background: #E4ECE2; color: #8F9E8B; padding: 3px 10px; border-radius: 100px; font-weight:500;">${ing}</span>`).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        ${unmatched.length > 0 ? `
+          <div>
+            <strong style="font-size: 11px; color: var(--color-dusty-rose); display: block; margin-bottom: 6px;">+ Buy to make it a premium, healthy meal:</strong>
+            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              ${unmatched.map(ing => `<span style="font-size: 10px; background: #FFF0ED; color: #D4A396; padding: 3px 10px; border-radius: 100px; font-weight:500;">🛒 ${ing}</span>`).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <div style="background: white; border-radius: 12px; padding: 10px; border: 1px solid var(--color-border);">
+          <strong style="font-size: 11px; color: var(--color-text-charcoal); display: block; margin-bottom: 2px;">✨ Sovereign Quality Boosters:</strong>
+          <p style="font-size: 11px; color: var(--color-text-muted); line-height: 1.4; font-style: italic;">
+            ${boosterTip}
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 6px;">
+          <button id="ai-pantry-plan-btn" style="flex: 1; background-color: var(--color-dusty-rose); color: white; border: none; padding: 10px; border-radius: 12px; font-family: var(--font-sans); font-size: 12px; font-weight: 600; cursor: pointer; transition: var(--transition-smooth);">
+            Schedule for Today
+          </button>
+          <button id="ai-pantry-shopping-btn" style="background-color: var(--color-sage-green-light); color: var(--color-sage-green); border: none; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition-smooth);" title="Add missing items to shopping list">
+            <i data-lucide="shopping-cart" style="width: 16px; height: 16px;"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Tips banner -->
+      <div style="background-color: var(--color-champagne-bg); border-radius: 16px; padding: 16px; font-size: 12px; line-height: 1.5; color: var(--color-text-muted); border: 1px dashed var(--color-border);">
+        <p>💡 <em>Tip:</em> Try typing a country name like <strong>"Tunisia"</strong> or <strong>"Morocco"</strong> in the search bar above to generate a list of regional options and their ingredients!</p>
       </div>
     `;
+
+    // Bind event listeners for the smart match card
+    document.getElementById('ai-pantry-plan-btn').addEventListener('click', () => {
+      const dateStr = `2026-07-${String(state.todayDate).padStart(2, '0')}`;
+      if (!state.scheduledMeals[dateStr]) {
+        state.scheduledMeals[dateStr] = [];
+      }
+      state.scheduledMeals[dateStr].push({
+        time: 'dinner',
+        title: title,
+        type: 'ai-pantry-match',
+        id: recipe.id
+      });
+      
+      showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${title}`);
+      renderCalendar();
+      renderWeeklyWidget();
+      updateTodayDashboardCard();
+      closeDrawer();
+    });
+
+    document.getElementById('ai-pantry-shopping-btn').addEventListener('click', () => {
+      if (unmatched.length > 0) {
+        showToast(`Added ${unmatched.length} ingredients to your Shopping List!`);
+      } else {
+        showToast('All ingredients are already in your pantry!');
+      }
+      closeDrawer();
+    });
+
+    lucide.createIcons();
     return;
   }
 
@@ -1443,6 +1544,97 @@ function renderAIDrawerRecipes(cuisineKey, customQuery = '') {
   });
   
   lucide.createIcons();
+}
+
+// --- Dynamic Pantry Analyzer Engine ---
+function getPantryAIPrompt() {
+  const pantryNames = state.pantryItems.map(item => {
+    let name = item.name;
+    if (state.lang === 'fr' && item.name_fr) name = item.name_fr;
+    if (state.lang === 'es' && item.name_es) name = item.name_es;
+    if (state.lang === 'ar' && item.name_ar) name = item.name_ar;
+    return name.toLowerCase();
+  });
+  
+  let bestRecipe = null;
+  let maxMatches = -1;
+  let matchingIngredients = [];
+  let missingIngredients = [];
+
+  // Flatten all recipes
+  const allRecipes = [...state.recipes];
+  Object.values(cuisineDatabase).forEach(list => {
+    allRecipes.push(...list);
+  });
+
+  allRecipes.forEach(recipe => {
+    // Determine title
+    let titleStr = '';
+    if (typeof recipe.title === 'string') {
+      titleStr = recipe.title;
+    } else {
+      titleStr = recipe.title[state.region] || recipe.title.Mediterranean;
+    }
+
+    // Determine ingredients array
+    let recipeIngs = [];
+    if (Array.isArray(recipe.ingredients)) {
+      recipeIngs = recipe.ingredients;
+    } else if (recipe.ingredients && recipe.ingredients[state.lang]) {
+      recipeIngs = recipe.ingredients[state.lang];
+    } else if (recipe.ingredients && recipe.ingredients.en) {
+      recipeIngs = recipe.ingredients.en;
+    } else {
+      recipeIngs = [];
+    }
+
+    let matches = 0;
+    const matched = [];
+    const unmatched = [];
+
+    recipeIngs.forEach(ing => {
+      const isMatched = pantryNames.some(pName => ing.toLowerCase().includes(pName) || pName.includes(ing.toLowerCase()));
+      if (isMatched) {
+        matches++;
+        matched.push(ing);
+      } else {
+        unmatched.push(ing);
+      }
+    });
+
+    if (matches > maxMatches) {
+      maxMatches = matches;
+      bestRecipe = {
+        ...recipe,
+        resolvedTitle: titleStr,
+        resolvedIngredients: recipeIngs
+      };
+      matchingIngredients = matched;
+      missingIngredients = unmatched;
+    }
+  });
+
+  // If no pantry items exist or no matches, fallback to first recipe
+  if (!bestRecipe || maxMatches <= 0) {
+    const firstRec = state.recipes[0];
+    let titleStr = firstRec.title[state.region];
+    let recipeIngs = firstRec.ingredients[state.lang] || firstRec.ingredients.en;
+    
+    bestRecipe = {
+      ...firstRec,
+      resolvedTitle: titleStr,
+      resolvedIngredients: recipeIngs
+    };
+    matchingIngredients = [];
+    missingIngredients = recipeIngs;
+  }
+
+  return {
+    recipe: bestRecipe,
+    matched: matchingIngredients,
+    unmatched: missingIngredients,
+    score: maxMatches
+  };
 }
 
 // --- Drawer Open/Close UI Helper ---

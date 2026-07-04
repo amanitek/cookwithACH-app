@@ -144,7 +144,10 @@ const locales = {
     filter_sweet: 'Sweet Tarts',
     ai_concierge_title: 'ACH AI Concierge',
     ai_concierge_intro: 'Welcome back Alexandra. I see you have Atlantic Salmon and Fresh Avocados in your pantry. I suggest planning a warm culinary evening with:',
-    ai_concierge_action: 'Plan dinner for today'
+    ai_concierge_action: 'Plan dinner for today',
+    batch_badge: 'Batch Cooking Planner',
+    batch_title: 'Plan Your Week in 1 Hour',
+    batch_desc: 'Cook 4 healthy, premium meals simultaneously for the fridge.'
   },
   fr: {
     loading_tagline: 'Préparation de votre conciergerie...',
@@ -187,7 +190,10 @@ const locales = {
     filter_sweet: 'Douceurs',
     ai_concierge_title: 'ACH Assistant IA',
     ai_concierge_intro: 'Bienvenue Alexandra. Je vois du Saumon Atlantique et des Avocats Frais dans votre cuisine. Je vous suggère de planifier un dîner avec :',
-    ai_concierge_action: 'Planifier le dîner d\'aujourd\'hui'
+    ai_concierge_action: 'Planifier le dîner d\'aujourd\'hui',
+    batch_badge: 'Planificateur Batch Cooking',
+    batch_title: 'Cuisinez votre semaine en 1 heure',
+    batch_desc: 'Préparez 4 plats sains simultanément pour le réfrigérateur.'
   },
   es: {
     loading_tagline: 'Preparando su asistente culinario...',
@@ -230,7 +236,10 @@ const locales = {
     filter_sweet: 'Postres',
     ai_concierge_title: 'ACH Asistente IA',
     ai_concierge_intro: 'Bienvenida mi Reina. Veo que tiene Salmón del Atlántico y Aguacates Frescos en su alacena. Le sugiero planificar una noche con:',
-    ai_concierge_action: 'Programar cena para hoy'
+    ai_concierge_action: 'Programar cena para hoy',
+    batch_badge: 'Planificación de Lote',
+    batch_title: 'Planifique su semana en 1 hora',
+    batch_desc: 'Cocine 4 comidas saludables simultáneamente para el refrigerador.'
   },
   ar: {
     loading_tagline: 'جاري تخصيص مساعدكِ الفاخر...',
@@ -273,7 +282,10 @@ const locales = {
     filter_sweet: 'حلويات',
     ai_concierge_title: 'مساعد الذكاء الاصطناعي الفاخر',
     ai_concierge_intro: 'أهلاً بكِ يا جلالة الملكة. أرى أن لديكِ السلمون الأطلسي والأفوكادو الطازج في المخزن. أقترح عليكِ التخطيط لأمسية طهي دافئة مع:',
-    ai_concierge_action: 'خططي للعشاء اليوم'
+    ai_concierge_action: 'خططي للعشاء اليوم',
+    batch_badge: 'مخطط الطهي الجماعي',
+    batch_title: 'خططي لوجبات أسبوعكِ في ساعة واحدة',
+    batch_desc: 'اطهي 4 وجبات صحية وراقية معاً لحفظها في الثلاجة.'
   }
 };
 
@@ -290,6 +302,7 @@ const dom = {
   shelfItems: document.getElementById('shelf-items'),
   plannedCount: document.getElementById('planned-count-badge'),
   monthDisplay: document.getElementById('current-month-display'),
+  batchCookTrigger: document.getElementById('batch-cook-trigger'),
   
   // Header Language Switcher
   headerLangBtn: document.getElementById('header-lang-btn'),
@@ -407,6 +420,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // 5. Setup AI Concierge & Sparkle Triggers
   dom.conciergeTrigger.addEventListener('click', triggerAIConcierge);
   dom.aiGenerateBtn.addEventListener('click', triggerAIConcierge);
+  if (dom.batchCookTrigger) {
+    dom.batchCookTrigger.addEventListener('click', triggerBatchCookingPlan);
+  }
   dom.drawerOverlay.addEventListener('click', closeDrawer);
 
   // 6. Setup Modal Popup Events
@@ -1702,6 +1718,131 @@ function showToast(message) {
   setTimeout(() => {
     dom.toast.classList.remove('active');
   }, 3000);
+}
+
+// --- Batch Cooking Planner Generator ---
+function triggerBatchCookingPlan() {
+  let headerText = 'Batch Cooking Planner';
+  let descText = 'Optimized weekly prep guide. Cook 4 meals in parallel, store in the fridge, and enjoy all week!';
+  let scheduleBtnText = 'Schedule All Meals to Calendar';
+  let stepTitle = 'Simultaneous Cook Flow (60 Mins)';
+  let storageTitle = 'Storage Instructions';
+  
+  if (state.lang === 'fr') {
+    headerText = 'Planificateur Batch Cooking';
+    descText = 'Guide de préparation hebdomadaire. Cuisinez 4 plats en parallèle pour toute la semaine !';
+    scheduleBtnText = 'Planifier tous ces repas dans mon calendrier';
+    stepTitle = 'Étapes de cuisson simultanée (60 mins)';
+    storageTitle = 'Instructions de stockage';
+  } else if (state.lang === 'es') {
+    headerText = 'Planificador de Lote';
+    descText = 'Optimice su cocina cocinando 4 comidas a la vez para conservar en el refrigerador.';
+    scheduleBtnText = 'Programar todas las comidas en el calendario';
+    stepTitle = 'Flujo de cocción simultánea (60 mins)';
+    storageTitle = 'Instrucciones de almacenamiento';
+  } else if (state.lang === 'ar') {
+    headerText = 'مخطط الطهي الجماعي (Batch Cooking)';
+    descText = 'دليل التحضير الأسبوعي المبتكر. اطهي 4 وجبات معاً في وقت واحد لتخزينها في الثلاجة للأسبوع!';
+    scheduleBtnText = 'جدولة جميع الوجبات في التقويم';
+    stepTitle = 'خطوات الطهي المتزامن (60 دقيقة)';
+    storageTitle = 'تعليمات الحفظ والتخزين';
+  }
+
+  // Pre-selected batch recipes
+  const batchMeals = [
+    { title: 'Tunisian Royal Couscous', category: 'mains', day: 5 }, // Friday
+    { title: 'Porcini Mushroom Risotto', category: 'mains', day: 6 }, // Saturday
+    { title: 'Provencal Vegetable Ratatouille', category: 'mains', day: 7 }, // Sunday
+    { title: 'Cucumber Dill Yogurt Bowl', category: 'light', day: 8 } // Monday
+  ];
+
+  dom.drawerContent.innerHTML = `
+    <div class="drawer-header" style="margin-bottom: 12px;">
+      <div class="drawer-title-col">
+        <span class="drawer-origin" style="color: var(--color-sage-green); font-weight: 600;">ACH AI Concierge</span>
+        <h2 class="drawer-title" style="font-family: var(--font-serif); font-size: 22px;">${headerText}</h2>
+      </div>
+    </div>
+
+    <p style="font-size: 12px; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 16px;">
+      ${descText}
+    </p>
+
+    <!-- Planned Menu Overview -->
+    <div style="background-color: var(--color-champagne-bg); border-radius: 16px; padding: 14px; margin-bottom: 16px; border: 1px solid var(--color-border);">
+      <strong style="font-size: 12px; color: var(--color-text-charcoal); display: block; margin-bottom: 8px;">📋 Target Weekly Menu:</strong>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; justify-content:space-between; font-size:11px;">
+          <span>🇹🇳 <strong>Tunisian Royal Couscous</strong></span>
+          <span style="color: var(--color-text-muted);">Friday Dinner</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px;">
+          <span>🇮🇹 <strong>Porcini Mushroom Risotto</strong></span>
+          <span style="color: var(--color-text-muted);">Saturday Dinner</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px;">
+          <span>🇫🇷 <strong>Provencal Vegetable Ratatouille</strong></span>
+          <span style="color: var(--color-text-muted);">Sunday Dinner</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:11px;">
+          <span>🍶 <strong>Cucumber Dill Yogurt Bowl</strong></span>
+          <span style="color: var(--color-text-muted);">Monday Lunch</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Simultaneous Cook Steps -->
+    <div style="margin-bottom: 16px;">
+      <strong style="font-size: 12px; color: var(--color-text-charcoal); display: block; margin-bottom: 6px;">🍳 ${stepTitle}:</strong>
+      <ul style="font-size: 11px; color: var(--color-text-muted); line-height: 1.6; padding-left: 16px;">
+        <li>🔥 <strong>0-10 Min (Oven Prep)</strong>: Chop eggplant, zucchini, squash, and carrots. Toss in olive oil and herbs; roast at 400°F (shared for Couscous and Ratatouille).</li>
+        <li>🍚 <strong>10-30 Min (Stove Base)</strong>: Simmer vegetable broth for Arborio rice and steam Semolina couscous in parallel pots.</li>
+        <li>🥣 <strong>30-45 Min (Cold Prep)</strong>: Chop fresh cucumbers and dill; fold into Greek yogurt with cold-pressed olive oil for the Yogurt Bowls.</li>
+        <li>🍲 <strong>45-60 Min (Assemble)</strong>: Stir roasted vegetables into tomato sauce for Ratatouille. Combine Arborio rice with porcini mushrooms and truffle oil for Risotto.</li>
+      </ul>
+    </div>
+
+    <!-- Storage instructions -->
+    <div style="background-color: #FFF6F3; border-radius: 12px; padding: 12px; border: 1px solid rgba(212, 163, 150, 0.2); margin-bottom: 20px;">
+      <strong style="font-size: 11px; color: var(--color-dusty-rose); display: block; margin-bottom: 2px;">❄️ ${storageTitle}:</strong>
+      <p style="font-size: 11px; color: var(--color-text-muted); line-height: 1.4;">
+        Pack meals individually in airtight glass containers. Risotto, Couscous, and Ratatouille keep perfectly in the fridge for up to 5 days. Keep Yogurt Bowls chilled.
+      </p>
+    </div>
+
+    <!-- Action Button to schedule all -->
+    <button id="ai-batch-schedule-btn" class="drawer-plan-action-btn">
+      ${scheduleBtnText}
+    </button>
+  `;
+
+  // Attach listener to Schedule All
+  document.getElementById('ai-batch-schedule-btn').addEventListener('click', () => {
+    batchMeals.forEach(meal => {
+      const dateStr = `2026-07-${String(meal.day).padStart(2, '0')}`;
+      if (!state.scheduledMeals[dateStr]) {
+        state.scheduledMeals[dateStr] = [];
+      }
+      state.scheduledMeals[dateStr].push({
+        time: meal.category === 'light' ? 'lunch' : 'dinner',
+        title: meal.title,
+        type: 'batch-cook',
+        id: 'batch-' + Date.now() + '-' + meal.day
+      });
+    });
+
+    const successMsg = state.lang === 'fr' ? 'Plan de batch cooking planifié dans le calendrier !' :
+                       (state.lang === 'es' ? '¡Planificación de lote programada en el calendario!' :
+                       (state.lang === 'ar' ? 'تمت جدولة خطة الطهي الجماعي بنجاح!' : 'Batch cooking plan scheduled on calendar!'));
+    
+    showToast(successMsg);
+    renderCalendar();
+    renderWeeklyWidget();
+    updateTodayDashboardCard();
+    closeDrawer();
+  });
+
+  openDrawer();
 }
 
 // --- Translation/Localization Core ---

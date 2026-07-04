@@ -447,6 +447,26 @@ document.addEventListener('DOMContentLoaded', () => {
   if (dom.pantryModalSaveBtn) {
     dom.pantryModalSaveBtn.addEventListener('click', savePantryItem);
   }
+  if (dom.pantryItemNameInput) {
+    dom.pantryItemNameInput.addEventListener('change', () => {
+      const val = dom.pantryItemNameInput.value;
+      let emoji = '🌿';
+      if (['Organic Spinach', 'Eggplant', 'Peppers', 'Zucchini', 'Carrots'].includes(val)) emoji = '🥬';
+      if (['Tomato'].includes(val)) emoji = '🍅';
+      if (['Lemon'].includes(val)) emoji = '🍋';
+      if (['Fresh Avocados'].includes(val)) emoji = '🥑';
+      if (['Atlantic Salmon', 'Fresh Tuna', 'Sea Bass'].includes(val)) emoji = '🐟';
+      if (['Shrimp'].includes(val)) emoji = '🍤';
+      if (['Beef Steak', 'Minced Meat', 'Lamb Chops'].includes(val)) emoji = '🥩';
+      if (['Chicken Breast'].includes(val)) emoji = '🍗';
+      if (['Fresh Berries'].includes(val)) emoji = '🍓';
+      if (['Apples'].includes(val)) emoji = '🍎';
+      if (['Greek Yogurt'].includes(val)) emoji = '🍶';
+      if (['Organic Eggs'].includes(val)) emoji = '🥚';
+      if (['Fresh Cheese'].includes(val)) emoji = '🧀';
+      dom.pantryItemEmojiSelect.value = emoji;
+    });
+  }
 
   // 7. Initial Data Renders
   renderPantry();
@@ -565,9 +585,9 @@ function showPantryModal(id = null) {
     } else {
       editingPantryItemId = null;
       dom.pantryModalTitle.textContent = state.lang === 'fr' ? 'Ajouter un ingrédient' : (state.lang === 'es' ? 'Agregar ingrediente' : (state.lang === 'ar' ? 'إضافة مكون جديد' : 'Add Ingredient'));
-      dom.pantryItemNameInput.value = '';
-      dom.pantryItemQtyInput.value = '';
-      dom.pantryItemEmojiSelect.value = '🌿';
+      dom.pantryItemNameInput.value = 'Organic Spinach';
+      dom.pantryItemQtyInput.value = '1 unit';
+      dom.pantryItemEmojiSelect.value = '🥬';
     }
     dom.pantryItemNameInput.focus();
   }

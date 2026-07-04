@@ -307,10 +307,55 @@
     <h3 class="modal-title" id="pantry-modal-title">Add Ingredient</h3>
     
     <label style="font-size: 11px; font-weight:600; color:var(--color-text-muted); margin-bottom: 4px; display: block;">Ingredient Name</label>
-    <input type="text" id="pantry-item-name" placeholder="E.g., Fresh Basil" class="modal-input">
+    <select id="pantry-item-name" class="settings-select" style="width: 100%; margin-bottom: 16px; padding: 10px; border-radius: 12px; height: 38px; font-size: 13px;">
+      <optgroup label="Fruits & Vegetables">
+        <option value="Organic Spinach">🥬 Organic Spinach</option>
+        <option value="Garlic">🧄 Garlic</option>
+        <option value="Tomato">🍅 Tomato</option>
+        <option value="Lemon">🍋 Lemon</option>
+        <option value="Basil">🌿 Basil</option>
+        <option value="Fresh Avocados">🥑 Fresh Avocados</option>
+        <option value="Onion">🧅 Onion</option>
+        <option value="Zucchini">🥒 Zucchini</option>
+        <option value="Carrots">🥕 Carrots</option>
+        <option value="Peppers">🫑 Peppers</option>
+        <option value="Eggplant">🍆 Eggplant</option>
+        <option value="Fresh Berries">🍓 Fresh Berries</option>
+        <option value="Apples">🍎 Apples</option>
+      </optgroup>
+      <optgroup label="Meat & Poultry">
+        <option value="Beef Steak">🥩 Beef Steak</option>
+        <option value="Chicken Breast">🍗 Chicken Breast</option>
+        <option value="Minced Meat">🥩 Minced Meat</option>
+        <option value="Lamb Chops">🍖 Lamb Chops</option>
+      </optgroup>
+      <optgroup label="Fish & Seafood">
+        <option value="Atlantic Salmon">🐟 Atlantic Salmon</option>
+        <option value="Fresh Tuna">🐟 Fresh Tuna</option>
+        <option value="Sea Bass">🐟 Sea Bass</option>
+        <option value="Shrimp">🍤 Shrimp</option>
+      </optgroup>
+      <optgroup label="Dairy & Eggs">
+        <option value="Greek Yogurt">🍶 Greek Yogurt</option>
+        <option value="Organic Eggs">🥚 Organic Eggs</option>
+        <option value="Fresh Cheese">🧀 Fresh Cheese</option>
+      </optgroup>
+    </select>
     
     <label style="font-size: 11px; font-weight:600; color:var(--color-text-muted); margin-bottom: 4px; display: block;">Quantity / Volume</label>
-    <input type="text" id="pantry-item-qty" placeholder="E.g., 2 bunches" class="modal-input">
+    <select id="pantry-item-qty" class="settings-select" style="width: 100%; margin-bottom: 16px; padding: 10px; border-radius: 12px; height: 38px; font-size: 13px;">
+      <option value="1 unit">1 unit / piece</option>
+      <option value="2 units">2 units / pieces</option>
+      <option value="3 units">3 units / pieces</option>
+      <option value="1 bunch">1 bunch</option>
+      <option value="2 bunches">2 bunches</option>
+      <option value="100g">100g</option>
+      <option value="250g">250g</option>
+      <option value="500g">500g</option>
+      <option value="1 can">1 can</option>
+      <option value="1 fillet">1 fillet</option>
+      <option value="2 fillets">2 fillets</option>
+    </select>
     
     <label style="font-size: 11px; font-weight:600; color:var(--color-text-muted); margin-bottom: 4px; display: block;">Emoji Icon</label>
     <select id="pantry-item-emoji" class="settings-select" style="width: 100%; margin-bottom: 20px; padding: 10px; border-radius: 12px; height: 38px;">

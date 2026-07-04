@@ -14,7 +14,7 @@ const state = {
   currentMonth: 6, // July (0-indexed)
   todayDate: 4,    // July 4th, 2026
   
-  pantryItems: [
+  pantryItems: JSON.parse(localStorage.getItem('cookwithach_pantry')) || [
     { id: 'p1', name: 'Atlantic Salmon', name_fr: 'Saumon Atlantique', name_es: 'Salmón del Atlántico', name_ar: 'سلمون أطلسي', qty: '450g', icon: '🐟', matchRecipe: 'r1' },
     { id: 'p2', name: 'Fresh Avocados', name_fr: 'Avocats Frais', name_es: 'Aguacates Frescos', name_ar: 'أفوكادو طازج', qty: '3 units', icon: '🥑', matchRecipe: 'r2' },
     { id: 'p3', name: 'Organic Spinach', name_fr: 'Épinards Bio', name_es: 'Espinacas Orgánicas', name_ar: 'سبانخ عضوية', qty: '200g', icon: '🥬', matchRecipe: 'r3' },
@@ -98,7 +98,7 @@ const state = {
   ],
   
   // Planned/scheduled meals keyed by date e.g. "2026-07-04" => [{time: "dinner", title: "Salmon", type: "recipe", id: "r1"}]
-  scheduledMeals: {}
+  scheduledMeals: JSON.parse(localStorage.getItem('cookwithach_scheduled')) || {}
 };
 
 // --- Translations & Localization Dictionaries ---
@@ -572,6 +572,7 @@ function deletePantryItem(id) {
   if (index !== -1) {
     const name = state.pantryItems[index].name;
     state.pantryItems.splice(index, 1);
+    localStorage.setItem('cookwithach_pantry', JSON.stringify(state.pantryItems));
     showToast(`${name} removed from pantry`);
     renderPantry();
   }
@@ -645,6 +646,7 @@ function savePantryItem() {
     state.pantryItems.push(newItem);
     showToast(`${name} added to pantry!`);
   }
+  localStorage.setItem('cookwithach_pantry', JSON.stringify(state.pantryItems));
 
   closePantryModal();
   renderPantry();
@@ -673,6 +675,7 @@ function planMealInOneTap(recipeId) {
   showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${title}`);
   
   // Refresh UI Components
+  localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
   renderCalendar();
   renderWeeklyWidget();
   updateTodayDashboardCard();
@@ -874,6 +877,7 @@ function renderCalendar() {
           });
           
           showToast(`${locales[state.lang].toast_scheduled} ${d}: ${item.title}`);
+          localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
           renderCalendar();
           renderWeeklyWidget();
           updateTodayDashboardCard();
@@ -1601,6 +1605,7 @@ function renderAIDrawerRecipes(cuisineKey, customQuery = '') {
       });
       
       showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${title}`);
+      localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
       renderCalendar();
       renderWeeklyWidget();
       updateTodayDashboardCard();
@@ -1680,6 +1685,7 @@ function renderAIDrawerRecipes(cuisineKey, customQuery = '') {
       });
       
       showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${recipe.title}`);
+      localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
       renderCalendar();
       renderWeeklyWidget();
       updateTodayDashboardCard();
@@ -1836,6 +1842,7 @@ function saveModalMeal() {
   showToast(`${locales[state.lang].toast_scheduled} ${selectedCalendarDay}: ${mealName}`);
   
   closeModal();
+  localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
   renderCalendar();
   renderWeeklyWidget();
   updateTodayDashboardCard();
@@ -1970,6 +1977,7 @@ function triggerBatchCookingPlan() {
                        (state.lang === 'ar' ? 'تمت جدولة خطة الطهي الجماعي بنجاح!' : 'Batch cooking plan scheduled on calendar!'));
     
     showToast(successMsg);
+    localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
     renderCalendar();
     renderWeeklyWidget();
     updateTodayDashboardCard();

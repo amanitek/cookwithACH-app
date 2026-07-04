@@ -15,10 +15,10 @@ const state = {
   todayDate: 4,    // July 4th, 2026
   
   pantryItems: [
-    { id: 'p1', name: 'Atlantic Salmon', name_fr: 'Saumon Atlantique', name_es: 'Salmón del Atlántico', qty: '450g', icon: '🐟', matchRecipe: 'r1' },
-    { id: 'p2', name: 'Fresh Avocados', name_fr: 'Avocats Frais', name_es: 'Aguacates Frescos', qty: '3 units', icon: '🥑', matchRecipe: 'r2' },
-    { id: 'p3', name: 'Organic Spinach', name_fr: 'Épinards Bio', name_es: 'Espinacas Orgánicas', qty: '200g', icon: '🥬', matchRecipe: 'r3' },
-    { id: 'p4', name: 'Greek Yogurt', name_fr: 'Yaourt Grec', name_es: 'Yogur Griego', qty: '500g', icon: '🍶', matchRecipe: 'r4' }
+    { id: 'p1', name: 'Atlantic Salmon', name_fr: 'Saumon Atlantique', name_es: 'Salmón del Atlántico', name_ar: 'سلمون أطلسي', qty: '450g', icon: '🐟', matchRecipe: 'r1' },
+    { id: 'p2', name: 'Fresh Avocados', name_fr: 'Avocats Frais', name_es: 'Aguacates Frescos', name_ar: 'أفوكادو طازج', qty: '3 units', icon: '🥑', matchRecipe: 'r2' },
+    { id: 'p3', name: 'Organic Spinach', name_fr: 'Épinards Bio', name_es: 'Espinacas Orgánicas', name_ar: 'سبانخ عضوية', qty: '200g', icon: '🥬', matchRecipe: 'r3' },
+    { id: 'p4', name: 'Greek Yogurt', name_fr: 'Yaourt Grec', name_es: 'Yogur Griego', name_ar: 'زبادي يوناني', qty: '500g', icon: '🍶', matchRecipe: 'r4' }
   ],
   
   // Recipes with regional specific cultures
@@ -229,8 +229,51 @@ const locales = {
     filter_light: 'Ligeros',
     filter_sweet: 'Postres',
     ai_concierge_title: 'ACH Asistente IA',
-    ai_concierge_intro: 'Bienvenida Alexandra. Veo que tiene Salmón del Atlántico y Aguacates Frescos en su alacena. Le sugiero planificar una noche con:',
+    ai_concierge_intro: 'Bienvenida mi Reina. Veo que tiene Salmón del Atlántico y Aguacates Frescos en su alacena. Le sugiero planificar una noche con:',
     ai_concierge_action: 'Programar cena para hoy'
+  },
+  ar: {
+    loading_tagline: 'جاري تخصيص مساعدكِ الفاخر...',
+    header_subtitle: 'قائمتكِ الشهية جاهزة الآن',
+    pantry_title: 'مخزني الخاص',
+    pantry_desc: 'اضغطي على المكونات للتخطيط السريع، أو خططي بلمسة واحدة.',
+    weekly_title: 'هذا الأسبوع',
+    discovery_title: 'استكشاف الوصفات',
+    planner_title: 'مخطط ACH الفاخر',
+    settings_title: 'إعدادات المساعد',
+    group_regional: 'التفضيلات الإقليمية',
+    label_region: 'الإقليم الطهي',
+    desc_region: 'يؤثر على تصنيفات الأصل والوصفات',
+    group_language: 'اللغة والنبرة',
+    label_lang: 'لغة التطبيق',
+    desc_lang: 'اختر لغة واجهة المستخدم',
+    group_preferences: 'السمات الجمالية',
+    label_theme: 'أجواء الألوان',
+    desc_theme: 'شامبانيا ناعمة أو درجات الوردي المخملي',
+    theme_champagne: 'شامبانيا',
+    theme_rose: 'وردي ناعم',
+    shelf_title: 'سحب وإسقاط الوجبات',
+    shelf_hint: 'اسحبي الوجبة وضعيها في أي يوم',
+    modal_title: 'تخطيط وجبة مخصصة',
+    modal_cancel: 'إلغاء',
+    modal_save: 'جدولة',
+    nav_dashboard: 'لوحة التحكم',
+    nav_discovery: 'استكشاف',
+    nav_planner: 'المخطط',
+    nav_settings: 'الإعدادات',
+    search_placeholder: 'ما الذي تشتهينه الليلة يا جلالة الملكة؟',
+    concierge_today: 'تركيز اليوم',
+    no_meals: 'لا توجد وجبات مخططة بعد',
+    no_meals_desc: 'اختاري مكوناً من المخزن أو استكشفي الوصفات لجدولة العشاء.',
+    toast_scheduled: 'تمت الجدولة بنجاح لشهر يوليو',
+    quick_plan_btn: 'خططي بلمسة',
+    filter_all: 'الكل',
+    filter_mains: 'الأطباق الرئيسية',
+    filter_light: 'وجبات خفيفة',
+    filter_sweet: 'حلويات',
+    ai_concierge_title: 'مساعد الذكاء الاصطناعي الفاخر',
+    ai_concierge_intro: 'أهلاً بكِ يا جلالة الملكة. أرى أن لديكِ السلمون الأطلسي والأفوكادو الطازج في المخزن. أقترح عليكِ التخطيط لأمسية طهي دافئة مع:',
+    ai_concierge_action: 'خططي للعشاء اليوم'
   }
 };
 
@@ -312,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup Header Language Switcher
   if (dom.headerLangBtn) {
     dom.headerLangBtn.addEventListener('click', () => {
-      state.lang = state.lang === 'en' ? 'fr' : (state.lang === 'fr' ? 'es' : 'en');
+      state.lang = state.lang === 'en' ? 'fr' : (state.lang === 'fr' ? 'es' : (state.lang === 'es' ? 'ar' : 'en'));
       updateLocalization();
     });
   }
@@ -1344,13 +1387,22 @@ function showToast(message) {
 
 // --- Translation/Localization Core ---
 function updateLocalization() {
-  // Update Header greeting based on language
+  // Update Header greeting to greet the user like a queen
   const greetings = {
-    en: 'Hello, Beautiful',
-    fr: 'Bonjour, Alexandra',
-    es: 'Hola, Alexandra'
+    en: 'Hello, My Queen',
+    fr: 'Bonjour, Ma Reine',
+    es: 'Hola, Mi Reina',
+    ar: 'مرحباً بمليكتي'
   };
   dom.headerGreeting.textContent = greetings[state.lang];
+
+  // Handle Right-to-Left (RTL) for Arabic layout direction
+  const frame = document.querySelector('.mobile-frame');
+  if (state.lang === 'ar') {
+    if (frame) frame.setAttribute('dir', 'rtl');
+  } else {
+    if (frame) frame.setAttribute('dir', 'ltr');
+  }
 
   // Sync Header lang switcher label
   if (dom.headerLangLabel) {

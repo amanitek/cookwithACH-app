@@ -1488,3 +1488,99 @@ body {
 @keyframes fadeInText {
   to { opacity: 0.8; }
 }
+
+/* --- RTL (Right-to-Left) Styling Support --- */
+.mobile-frame[dir="rtl"] {
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .header-info {
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .search-box {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .search-box input {
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .section-header {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .section-desc {
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .weekly-row {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .weekly-day {
+  flex-direction: column;
+}
+
+.mobile-frame[dir="rtl"] .pantry-item {
+  text-align: right;
+  align-items: flex-start;
+}
+
+.mobile-frame[dir="rtl"] .pantry-btn-plan {
+  align-self: flex-start;
+}
+
+.mobile-frame[dir="rtl"] .recipe-quick-add-btn {
+  right: auto;
+  left: 16px;
+}
+
+.mobile-frame[dir="rtl"] .recipe-card-overlay {
+  right: auto;
+  left: 12px;
+}
+
+.mobile-frame[dir="rtl"] .recipe-card-info {
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .recipe-meta-row {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .planner-title-row {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .shelf-header {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .settings-item {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .settings-item-info {
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .drawer-header {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.mobile-frame[dir="rtl"] .drawer-title-col {
+  text-align: right;
+  padding-right: 0;
+  padding-left: 12px;
+}
+
+.mobile-frame[dir="rtl"] .drawer-meta-row {
+  flex-direction: row-reverse;
+}
+
+.mobile-frame[dir="rtl"] .drawer-ingredients li {
+  flex-direction: row-reverse;
+  text-align: right;
+}

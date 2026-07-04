@@ -451,7 +451,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.pantryItemNameInput.addEventListener('change', () => {
       const val = dom.pantryItemNameInput.value;
       let emoji = '🌿';
-      if (['Organic Spinach', 'Eggplant', 'Peppers', 'Zucchini', 'Carrots'].includes(val)) emoji = '🥬';
+      if (['Organic Spinach', 'Eggplant', 'Peppers', 'Zucchini', 'Carrots', 'Jute Leaves (Mloukhia)'].includes(val)) emoji = '🥬';
       if (['Tomato'].includes(val)) emoji = '🍅';
       if (['Lemon'].includes(val)) emoji = '🍋';
       if (['Fresh Avocados'].includes(val)) emoji = '🥑';
@@ -459,11 +459,20 @@ document.addEventListener('DOMContentLoaded', () => {
       if (['Shrimp'].includes(val)) emoji = '🍤';
       if (['Beef Steak', 'Minced Meat', 'Lamb Chops'].includes(val)) emoji = '🥩';
       if (['Chicken Breast'].includes(val)) emoji = '🍗';
+      if (['Merguez Sausage'].includes(val)) emoji = '🌭';
       if (['Fresh Berries'].includes(val)) emoji = '🍓';
       if (['Apples'].includes(val)) emoji = '🍎';
       if (['Greek Yogurt'].includes(val)) emoji = '🍶';
       if (['Organic Eggs'].includes(val)) emoji = '🥚';
       if (['Fresh Cheese'].includes(val)) emoji = '🧀';
+      if (['Potatoes'].includes(val)) emoji = '🥔';
+      if (['Green Peas'].includes(val)) emoji = '🫛';
+      if (['Semolina Couscous', 'Bulgur (Borghol)'].includes(val)) emoji = '🌾';
+      if (['Nwasser Pasta', 'Dwida Vermicelli'].includes(val)) emoji = '🍝';
+      if (['White Beans (Loubia)'].includes(val)) emoji = '🫘';
+      if (['Chorba Vermicelli'].includes(val)) emoji = '🍜';
+      if (['Harissa Paste'].includes(val)) emoji = '🌶️';
+      if (['Tomato Paste'].includes(val)) emoji = '🥫';
       dom.pantryItemEmojiSelect.value = emoji;
     });
   }
@@ -1024,43 +1033,142 @@ const cuisineDatabase = {
       prepTime: '45 mins',
       image: 'assets/pantry.jpg',
       culture: 'Tunisian Heritage',
-      ingredients: ['Couscous Semolina', 'Chickpeas', 'Zucchini', 'Carrots', 'Ras el Hanout Harissa', 'Olive Oil']
+      ingredients: ['Semolina Couscous', 'Zucchini', 'Carrots', 'Potatoes', 'Lamb Chops', 'Tomato Paste', 'Harissa Paste']
     },
     {
       id: 'tun2',
-      title: 'Ojja Shakshuka with Harissa',
-      calories: '320 kcal',
+      title: 'Ojja with Merguez & Eggs',
+      calories: '380 kcal',
       prepTime: '20 mins',
       image: 'assets/salmon.jpg',
       culture: 'Tunisian Traditional',
-      ingredients: ['Organic Eggs', 'Red Bell Peppers', 'Fresh Tomatoes', 'Harissa Paste', 'Olive Oil', 'Garlic']
+      ingredients: ['Organic Eggs', 'Peppers', 'Tomato', 'Merguez Sausage', 'Garlic', 'Harissa Paste']
     },
     {
       id: 'tun3',
-      title: 'Crispy Tuna & Parsley Brik',
-      calories: '290 kcal',
-      prepTime: '15 mins',
+      title: 'Grilled Slata Mechouia Plate',
+      calories: '210 kcal',
+      prepTime: '30 mins',
       image: 'assets/pastry.jpg',
-      culture: 'Tunisian Coastline',
-      ingredients: ['Malsouka pastry sheets', 'Canned Tuna', 'Egg', 'Fresh Parsley', 'Capers', 'Lemon juice']
+      culture: 'Tunisian Oasis',
+      ingredients: ['Peppers', 'Tomato', 'Garlic', 'Fresh Tuna', 'Organic Eggs']
     },
     {
       id: 'tun4',
-      title: 'Tunisian Lablabi Chickpea Soup',
-      calories: '380 kcal',
-      prepTime: '25 mins',
+      title: 'Dwida Mfawra (Steamed Angel Hair)',
+      calories: '460 kcal',
+      prepTime: '40 mins',
       image: 'assets/pantry.jpg',
-      culture: 'Tunisian Street Food',
-      ingredients: ['Chickpeas', 'Crusty Bread', 'Cumin', 'Harissa Paste', 'Poached Egg', 'Olive Oil', 'Garlic']
+      culture: 'Tunisian Steamed Pasta',
+      ingredients: ['Dwida Vermicelli', 'Chicken Breast', 'Garlic', 'Tomato Paste', 'Potatoes']
     },
     {
       id: 'tun5',
-      title: 'Grilled Mechouia Salad Plate',
-      calories: '210 kcal',
+      title: 'Steamed Nwasser Pasta with Chicken',
+      calories: '490 kcal',
+      prepTime: '45 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Square Pasta',
+      ingredients: ['Nwasser Pasta', 'Chicken Breast', 'Tomato Paste', 'Harissa Paste', 'Garlic']
+    },
+    {
+      id: 'tun6',
+      title: 'Rouz Jerbi (Djerbian Steamed Rice)',
+      calories: '420 kcal',
+      prepTime: '35 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Djerbian Tradition',
+      ingredients: ['Organic Spinach', 'Fresh Parsley', 'Chicken Breast', 'Green Peas', 'Carrots']
+    },
+    {
+      id: 'tun7',
+      title: 'Slow-Cooked Mloukhia Stew',
+      calories: '590 kcal',
+      prepTime: '180 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Signature',
+      ingredients: ['Jute Leaves (Mloukhia)', 'Beef Steak', 'Garlic', 'Onion']
+    },
+    {
+      id: 'tun8',
+      title: 'Tunisian-Style Baked Lasagne',
+      calories: '540 kcal',
+      prepTime: '50 mins',
+      image: 'assets/pastry.jpg',
+      culture: 'Tunisian Fusion',
+      ingredients: ['Nwasser Pasta', 'Minced Meat', 'Tomato Paste', 'Fresh Cheese', 'Garlic']
+    },
+    {
+      id: 'tun9',
+      title: 'Makrouna Sauce Blanche with Chicken',
+      calories: '480 kcal',
+      prepTime: '25 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Modern',
+      ingredients: ['Nwasser Pasta', 'Chicken Breast', 'Greek Yogurt', 'Fresh Cheese', 'Garlic']
+    },
+    {
+      id: 'tun10',
+      title: 'Healthy Borghol with Vegetables',
+      calories: '340 kcal',
       prepTime: '30 mins',
       image: 'assets/pantry.jpg',
-      culture: 'Tunisian Oasis',
-      ingredients: ['Grilled Peppers', 'Grilled Tomatoes', 'Garlic', 'Tuna chunks', 'Hard Boiled Egg', 'Olive Oil']
+      culture: 'Tunisian Grain Stew',
+      ingredients: ['Bulgur (Borghol)', 'Carrots', 'Zucchini', 'Tomato Paste', 'Garlic']
+    },
+    {
+      id: 'tun11',
+      title: 'Loubia (White Bean Stew)',
+      calories: '310 kcal',
+      prepTime: '35 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Winter Warmth',
+      ingredients: ['White Beans (Loubia)', 'Tomato Paste', 'Garlic', 'Harissa Paste']
+    },
+    {
+      id: 'tun12',
+      title: 'Mermez Chickpea & Onion Stew',
+      calories: '320 kcal',
+      prepTime: '40 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Medina Stew',
+      ingredients: ['White Beans (Loubia)', 'Onion', 'Tomato Paste', 'Beef Steak']
+    },
+    {
+      id: 'tun13',
+      title: 'Jelbena (Peas & Potatoes Stew)',
+      calories: '390 kcal',
+      prepTime: '35 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Peas Stew',
+      ingredients: ['Green Peas', 'Potatoes', 'Chicken Breast', 'Tomato Paste']
+    },
+    {
+      id: 'tun14',
+      title: 'Classic Tunisian Chakchouka',
+      calories: '280 kcal',
+      prepTime: '20 mins',
+      image: 'assets/salmon.jpg',
+      culture: 'Tunisian Rural Comfort',
+      ingredients: ['Peppers', 'Onion', 'Tomato', 'Organic Eggs']
+    },
+    {
+      id: 'tun15',
+      title: 'Golden Tunisian Baked Tajine',
+      calories: '390 kcal',
+      prepTime: '40 mins',
+      image: 'assets/pastry.jpg',
+      culture: 'Tunisian Baked Frittata',
+      ingredients: ['Organic Eggs', 'Fresh Parsley', 'Chicken Breast', 'Potatoes', 'Fresh Cheese']
+    },
+    {
+      id: 'tun16',
+      title: 'Chorba Mfawra (Steamed Vermicelli)',
+      calories: '440 kcal',
+      prepTime: '45 mins',
+      image: 'assets/pantry.jpg',
+      culture: 'Tunisian Traditional',
+      ingredients: ['Chorba Vermicelli', 'Lamb Chops', 'Tomato Paste', 'Garlic']
     }
   ],
   italian: [
@@ -1264,7 +1372,8 @@ function triggerAIConcierge() {
   if (queryInput) queryInput.value = '';
 
   let initialCuisine = '';
-  if (query.includes('tunis') || query.includes('shakshuka') || query.includes('couscous') || query.includes('brik') || query.includes('ojja')) {
+  const tunisianKeywords = ['tunis', 'shakshuka', 'couscous', 'brik', 'ojja', 'dwida', 'nwasser', 'rouz', 'mloukhia', 'slata', 'lasagne', 'makrouna', 'borghol', 'loubia', 'mermez', 'jelbena', 'tajine', 'chorba', 'chakchouka'];
+  if (tunisianKeywords.some(kw => query.includes(kw))) {
     initialCuisine = 'tunisian';
   } else if (query.includes('ital')) {
     initialCuisine = 'italian';
@@ -1330,7 +1439,8 @@ function renderAIDrawerLayout(activeCuisineKey = '') {
   const performSearch = () => {
     const term = searchInput.value.trim().toLowerCase();
     let matchKey = '';
-    if (term.includes('tunis') || term.includes('brik') || term.includes('ojja') || term.includes('couscous')) {
+    const tunisianKeywords = ['tunis', 'shakshuka', 'couscous', 'brik', 'ojja', 'dwida', 'nwasser', 'rouz', 'mloukhia', 'slata', 'lasagne', 'makrouna', 'borghol', 'loubia', 'mermez', 'jelbena', 'tajine', 'chorba', 'chakchouka'];
+    if (tunisianKeywords.some(kw => term.includes(kw))) {
       matchKey = 'tunisian';
     } else if (term.includes('ital') || term.includes('risotto') || term.includes('pasta')) {
       matchKey = 'italian';

@@ -147,7 +147,10 @@ const locales = {
     ai_concierge_action: 'Plan dinner for today',
     batch_badge: 'Batch Cooking Planner',
     batch_title: 'Plan Your Week in 1 Hour',
-    batch_desc: 'Cook 4 healthy, premium meals simultaneously for the fridge.'
+    batch_desc: 'Cook 4 healthy, premium meals simultaneously for the fridge.',
+    roulette_badge: 'AI Instant Idea',
+    roulette_cook_btn: 'Cook This',
+    roulette_next_btn: 'Shuffle'
   },
   fr: {
     loading_tagline: 'Préparation de votre conciergerie...',
@@ -193,7 +196,10 @@ const locales = {
     ai_concierge_action: 'Planifier le dîner d\'aujourd\'hui',
     batch_badge: 'Planificateur Batch Cooking',
     batch_title: 'Cuisinez votre semaine en 1 heure',
-    batch_desc: 'Préparez 4 plats sains simultanément pour le réfrigérateur.'
+    batch_desc: 'Préparez 4 plats sains simultanément pour le réfrigérateur.',
+    roulette_badge: 'Idée Express IA',
+    roulette_cook_btn: 'Cuisiner ceci',
+    roulette_next_btn: 'Mélanger'
   },
   es: {
     loading_tagline: 'Preparando su asistente culinario...',
@@ -239,7 +245,10 @@ const locales = {
     ai_concierge_action: 'Programar cena para hoy',
     batch_badge: 'Planificación de Lote',
     batch_title: 'Planifique su semana en 1 hora',
-    batch_desc: 'Cocine 4 comidas saludables simultáneamente para el refrigerador.'
+    batch_desc: 'Cocine 4 comidas saludables simultáneamente para el refrigerador.',
+    roulette_badge: 'Idea Express IA',
+    roulette_cook_btn: 'Cocinar esto',
+    roulette_next_btn: 'Mezclar'
   },
   ar: {
     loading_tagline: 'جاري تخصيص مساعدكِ الفاخر...',
@@ -285,7 +294,10 @@ const locales = {
     ai_concierge_action: 'خططي للعشاء اليوم',
     batch_badge: 'مخطط الطهي الجماعي',
     batch_title: 'خططي لوجبات أسبوعكِ في ساعة واحدة',
-    batch_desc: 'اطهي 4 وجبات صحية وراقية معاً لحفظها في الثلاجة.'
+    batch_desc: 'اطهي 4 وجبات صحية وراقية معاً لحفظها في الثلاجة.',
+    roulette_badge: 'فكرة ذكية سريعة',
+    roulette_cook_btn: 'طهي هذا الطبق',
+    roulette_next_btn: 'طبق آخر'
   }
 };
 
@@ -352,6 +364,10 @@ let selectedCalendarDay = null;
 
 // Track editing state for pantry CRUD
 let editingPantryItemId = null;
+
+// Track AI Roulette Suggestion State
+let rouletteIndex = 0;
+let rouletteRecipes = [];
 
 // --- Initialize App ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -477,12 +493,23 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Setup Suggestion Roulette Events
+  const acceptBtn = document.getElementById('roulette-accept-btn');
+  const nextBtn = document.getElementById('roulette-next-btn');
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', acceptRouletteMeal);
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', shuffleRouletteMeal);
+  }
+
   // 7. Initial Data Renders
   renderPantry();
   renderWeeklyWidget();
   renderDiscoveryFeed();
   renderCalendar();
   renderQuickShelf();
+  initCulinaryRoulette();
   updateLocalization();
   
   // Initialize lucide icon markup replacement
@@ -575,6 +602,7 @@ function deletePantryItem(id) {
     localStorage.setItem('cookwithach_pantry', JSON.stringify(state.pantryItems));
     showToast(`${name} removed from pantry`);
     renderPantry();
+    initCulinaryRoulette();
   }
 }
 
@@ -650,6 +678,7 @@ function savePantryItem() {
 
   closePantryModal();
   renderPantry();
+  initCulinaryRoulette();
 }
 
 // --- One-Tap Quick Plan Logic ---
@@ -726,21 +755,135 @@ function renderWeeklyWidget() {
   });
 }
 
-// --- Update Dashboard Announcement Card ---
+// --- Update Dashboard Suggestion Roulette / Today Focus Card ---
 function updateTodayDashboardCard() {
   const dateStr = `2026-07-${String(state.todayDate).padStart(2, '0')}`;
   const meals = state.scheduledMeals[dateStr] || [];
   
-  const titleEl = document.getElementById('today-plan-title');
-  const descEl = document.getElementById('today-plan-desc');
+  const titleEl = document.getElementById('roulette-meal-title');
+  const descEl = document.getElementById('roulette-meal-desc');
+  const acceptBtn = document.getElementById('roulette-accept-btn');
+  const nextBtn = document.getElementById('roulette-next-btn');
   
+  if (!titleEl || !descEl) return;
+
   if (meals.length > 0) {
-    const meal = meals[0]; // Get first planned meal
+    const meal = meals[0];
     titleEl.textContent = meal.title;
-    descEl.textContent = `Scheduled for ${meal.time.toUpperCase()} tonight. Bon appétit!`;
+    descEl.innerHTML = `🌟 <strong>${state.lang === 'ar' ? 'مخطط لليوم' : 'Scheduled for today!'}</strong> | Cook and enjoy your royal feast tonight.`;
+    if (acceptBtn) acceptBtn.style.display = 'none';
+    if (nextBtn) nextBtn.style.display = 'none';
   } else {
-    titleEl.textContent = locales[state.lang].no_meals;
-    descEl.textContent = locales[state.lang].no_meals_desc;
+    if (acceptBtn) acceptBtn.style.display = 'flex';
+    if (nextBtn) nextBtn.style.display = 'flex';
+    renderCurrentRouletteSuggestion();
+  }
+}
+
+// --- Suggestion Roulette Core Logic ---
+function initCulinaryRoulette() {
+  const allRecipes = [...state.recipes];
+  Object.values(cuisineDatabase).forEach(list => {
+    allRecipes.push(...list);
+  });
+
+  const pantryNames = state.pantryItems.map(item => item.name.toLowerCase());
+  
+  const scored = allRecipes.map(recipe => {
+    let titleStr = typeof recipe.title === 'string' ? recipe.title : (recipe.title[state.region] || recipe.title.Mediterranean);
+    let recipeIngs = Array.isArray(recipe.ingredients) ? recipe.ingredients : (recipe.ingredients[state.lang] || recipe.ingredients.en || []);
+    
+    let score = 0;
+    recipeIngs.forEach(ing => {
+      const isMatched = pantryNames.some(pName => ing.toLowerCase().includes(pName) || pName.includes(ing.toLowerCase()));
+      if (isMatched) score++;
+    });
+
+    return { recipe, title: titleStr, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  
+  rouletteRecipes = scored.map(s => s.recipe);
+  rouletteIndex = 0;
+  
+  updateTodayDashboardCard();
+}
+
+function renderCurrentRouletteSuggestion() {
+  if (rouletteRecipes.length === 0) return;
+  
+  const recipe = rouletteRecipes[rouletteIndex];
+  const titleEl = document.getElementById('roulette-meal-title');
+  const descEl = document.getElementById('roulette-meal-desc');
+  
+  if (!titleEl || !descEl) return;
+
+  const currentTitle = typeof recipe.title === 'string' ? recipe.title : (recipe.title[state.region] || recipe.title.Mediterranean);
+  titleEl.textContent = currentTitle;
+  
+  const pantryNames = state.pantryItems.map(item => item.name.toLowerCase());
+  let recipeIngs = Array.isArray(recipe.ingredients) ? recipe.ingredients : (recipe.ingredients[state.lang] || recipe.ingredients.en || []);
+  const matched = recipeIngs.filter(ing => pantryNames.some(pName => ing.toLowerCase().includes(pName) || pName.includes(ing.toLowerCase())));
+
+  let matchStr = '';
+  if (matched.length > 0) {
+    matchStr = state.lang === 'ar' ? ` (يستخدم ${matched.length} من مكونات مخزنكِ)` : ` (Uses ${matched.length} ingredients you have)`;
+  } else {
+    matchStr = state.lang === 'ar' ? ` (تحتاجين لشراء بعض المكونات)` : ` (Requires fresh ingredients)`;
+  }
+
+  descEl.textContent = `${recipe.prepTime} | ${recipe.calories}${matchStr}.`;
+}
+
+function acceptRouletteMeal() {
+  if (rouletteRecipes.length === 0) return;
+  const recipe = rouletteRecipes[rouletteIndex];
+  const title = typeof recipe.title === 'string' ? recipe.title : (recipe.title[state.region] || recipe.title.Mediterranean);
+  
+  const dateStr = `2026-07-${String(state.todayDate).padStart(2, '0')}`;
+  if (!state.scheduledMeals[dateStr]) {
+    state.scheduledMeals[dateStr] = [];
+  }
+  
+  state.scheduledMeals[dateStr].push({
+    time: 'dinner',
+    title: title,
+    type: 'roulette',
+    id: recipe.id
+  });
+
+  showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${title}`);
+  localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
+  
+  renderCalendar();
+  renderWeeklyWidget();
+  updateTodayDashboardCard();
+}
+
+function shuffleRouletteMeal() {
+  if (rouletteRecipes.length === 0) return;
+  
+  const icon = document.getElementById('roulette-spin-icon');
+  if (icon) {
+    icon.style.transform = 'rotate(360deg)';
+    setTimeout(() => {
+      icon.style.transform = 'rotate(0deg)';
+    }, 400);
+  }
+
+  rouletteIndex = (rouletteIndex + 1) % rouletteRecipes.length;
+  
+  const titleEl = document.getElementById('roulette-meal-title');
+  const descEl = document.getElementById('roulette-meal-desc');
+  if (titleEl && descEl) {
+    titleEl.style.opacity = 0.3;
+    descEl.style.opacity = 0.3;
+    setTimeout(() => {
+      renderCurrentRouletteSuggestion();
+      titleEl.style.opacity = 1;
+      descEl.style.opacity = 1;
+    }, 150);
   }
 }
 
@@ -931,51 +1074,116 @@ function renderQuickShelf() {
 
 // --- Pantry Ingredient Detail Drawer ---
 function openPantryDetails(ingredient) {
-  let displayName = ingredient.name;
-  if (state.lang === 'fr') displayName = ingredient.name_fr;
-  if (state.lang === 'es') displayName = ingredient.name_es;
+  const term = ingredient.name.toLowerCase();
+  
+  // Set drawer content layout
+  renderAIDrawerLayout();
+  
+  const searchInput = document.getElementById('ai-drawer-search');
+  if (searchInput) {
+    searchInput.value = ingredient.name;
+  }
+  
+  // Render all recipes utilizing this pantry item
+  renderRecipesByPantryIngredient(term);
+  openDrawer();
+}
 
-  // Find matching recipe
-  const matchingRecipe = state.recipes.find(r => r.id === ingredient.matchRecipe);
-  const recipeTitle = matchingRecipe ? matchingRecipe.title[state.region] : 'N/A';
+function renderRecipesByPantryIngredient(term) {
+  const container = document.getElementById('ai-recipes-container');
+  if (!container) return;
 
-  dom.drawerContent.innerHTML = `
-    <div class="drawer-header">
-      <div class="drawer-title-col">
-        <span class="drawer-origin">${state.region} Pantry Focus</span>
-        <h2 class="drawer-title">${displayName}</h2>
-      </div>
-    </div>
-    
-    <img src="assets/pantry.jpg" alt="Pantry" class="drawer-image">
-    
-    <div class="drawer-meta-row">
-      <div class="drawer-meta-pill">
-        <i data-lucide="package"></i>
-        <span>Stock: ${ingredient.qty}</span>
-      </div>
-      <div class="drawer-meta-pill">
-        <i data-lucide="tag"></i>
-        <span>Fresh Ingredient</span>
-      </div>
-    </div>
-    
-    <h3 class="drawer-section-title">Matching Concierge Suggestion</h3>
-    <p style="font-size: 13px; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 16px;">
-      We detected this ingredient in your pantry. We recommend matching it with <strong>${recipeTitle}</strong>.
-    </p>
-    
-    <button class="drawer-plan-action-btn" id="drawer-instant-schedule-btn">
-      Schedule Meal for Today
-    </button>
-  `;
-
-  document.getElementById('drawer-instant-schedule-btn').addEventListener('click', () => {
-    planMealInOneTap(ingredient.matchRecipe);
-    closeDrawer();
+  container.innerHTML = '';
+  
+  // Flatten recipes list
+  const allRecipes = [...state.recipes];
+  Object.values(cuisineDatabase).forEach(list => {
+    allRecipes.push(...list);
   });
 
-  openDrawer();
+  const matching = allRecipes.filter(recipe => {
+    let recipeIngs = Array.isArray(recipe.ingredients) ? recipe.ingredients : (recipe.ingredients[state.lang] || recipe.ingredients.en || []);
+    return recipeIngs.some(ing => ing.toLowerCase().includes(term) || term.includes(ing.toLowerCase()));
+  });
+
+  if (matching.length === 0) {
+    container.innerHTML = `
+      <p style="font-size: 13px; color: var(--color-text-muted); text-align: center; margin-top: 10px;">
+        No specific recipes found using this ingredient. Try searching a country.
+      </p>
+    `;
+    return;
+  }
+
+  matching.forEach(recipe => {
+    const recipeDiv = document.createElement('div');
+    recipeDiv.style.backgroundColor = 'white';
+    recipeDiv.style.border = '1px solid var(--color-border)';
+    recipeDiv.style.borderRadius = '16px';
+    recipeDiv.style.padding = '14px';
+    recipeDiv.style.boxShadow = 'var(--shadow-soft)';
+    recipeDiv.style.display = 'flex';
+    recipeDiv.style.flexDirection = 'column';
+    recipeDiv.style.gap = '8px';
+
+    let titleStr = typeof recipe.title === 'string' ? recipe.title : (recipe.title[state.region] || recipe.title.Mediterranean);
+    let recipeIngs = Array.isArray(recipe.ingredients) ? recipe.ingredients : (recipe.ingredients[state.lang] || recipe.ingredients.en || []);
+
+    recipeDiv.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <span style="font-size: 9px; font-weight: 600; text-transform: uppercase; color: var(--color-sage-green); letter-spacing: 0.5px;">${recipe.culture || 'Healthy Match'}</span>
+          <h4 style="font-family: var(--font-serif); font-size: 16px; color: var(--color-text-charcoal); margin-top: 2px;">${titleStr}</h4>
+        </div>
+        <span style="font-size: 11px; color: var(--color-text-muted); font-weight: 500;">${recipe.prepTime} | ${recipe.calories}</span>
+      </div>
+      
+      <div>
+        <span style="font-size: 11px; font-weight: 600; color: var(--color-text-muted);">Ingredients:</span>
+        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
+          ${recipeIngs.map(ing => {
+            const isHighlight = ing.toLowerCase().includes(term) || term.includes(ing.toLowerCase());
+            const bg = isHighlight ? 'var(--color-dusty-rose-light)' : 'var(--color-sage-green-light)';
+            const color = isHighlight ? 'var(--color-dusty-rose)' : 'var(--color-sage-green)';
+            return `
+              <span style="font-size: 10px; background: ${bg}; color: ${color}; padding: 2px 8px; border-radius: 100px; font-weight: 500;">
+                ${ing}
+              </span>
+            `;
+          }).join('')}
+        </div>
+      </div>
+
+      <button class="ai-drawer-plan-btn" data-recipe-title="${titleStr}" style="background-color: var(--color-dusty-rose); color: white; border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; align-self: flex-start; margin-top: 6px; display: flex; align-items: center; gap: 4px; transition: var(--transition-smooth);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i> Add to Today's Planner
+      </button>
+    `;
+
+    // Bind Plan click in AI drawer
+    recipeDiv.querySelector('.ai-drawer-plan-btn').addEventListener('click', () => {
+      const dateStr = `2026-07-${String(state.todayDate).padStart(2, '0')}`;
+      if (!state.scheduledMeals[dateStr]) {
+        state.scheduledMeals[dateStr] = [];
+      }
+      state.scheduledMeals[dateStr].push({
+        time: 'dinner',
+        title: titleStr,
+        type: 'ai-recipe',
+        id: recipe.id
+      });
+      
+      showToast(`${locales[state.lang].toast_scheduled} ${state.todayDate}: ${titleStr}`);
+      localStorage.setItem('cookwithach_scheduled', JSON.stringify(state.scheduledMeals));
+      renderCalendar();
+      renderWeeklyWidget();
+      updateTodayDashboardCard();
+      closeDrawer();
+    });
+
+    container.appendChild(recipeDiv);
+  });
+  
+  lucide.createIcons();
 }
 
 // --- Recipe Detail Drawer ---
